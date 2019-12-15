@@ -1,0 +1,3 @@
+{{- define "YAML" -}}
+{{ toYAML . }}
+{{- end -}}

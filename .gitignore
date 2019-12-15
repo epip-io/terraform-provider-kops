@@ -10,3 +10,10 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Project binary
+terraform-provider-kops
+
+# Project generated files
+*.gen.go
+vendor

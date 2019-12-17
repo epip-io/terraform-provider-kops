@@ -66,11 +66,12 @@ func main() {
 				"Schema": ts,
 			}
 
-			tr.AddRender(fmt.Sprintf("%s/api/marshal_%s.gen.go", outAbsDir, strcase.ToSnake(tn)), fmt.Sprintf("%s/marshal.tpl.go", tplAbsDir), rv)
-			tr.AddRender(fmt.Sprintf("%s/api/unmarshal_%s.gen.go", outAbsDir, strcase.ToSnake(tn)), fmt.Sprintf("%s/unmarshal.tpl.go", tplAbsDir), rv)
+			tr.AddRender(fmt.Sprintf("%s/convert/expand_%s.gen.go", outAbsDir, strcase.ToSnake(tn)), fmt.Sprintf("%s/expand.tpl.go", tplAbsDir), rv)
+			tr.AddRender(fmt.Sprintf("%s/convert/flatten_%s.gen.go", outAbsDir, strcase.ToSnake(tn)), fmt.Sprintf("%s/flatten.tpl.go", tplAbsDir), rv)
 			tr.AddRender(fmt.Sprintf("%s/api/schema_%s.gen.go", outAbsDir, strcase.ToSnake(tn)), fmt.Sprintf("%s/schema.tpl.go", tplAbsDir), rv)
 		}
 
+		tr.AddRender(fmt.Sprintf("%s/provider/datasource.gen.go", outAbsDir), fmt.Sprintf("%s/datasource.tpl.go", tplAbsDir), schema)
 		tr.AddRender(fmt.Sprintf("%s/provider/resources.gen.go", outAbsDir), fmt.Sprintf("%s/resource.tpl.go", tplAbsDir), schema)
 		tr.AddRender(fmt.Sprintf("%s/provider/provider.gen.go", outAbsDir), fmt.Sprintf("%s/provider.tpl.go", tplAbsDir), schema)
 	}

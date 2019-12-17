@@ -10,7 +10,7 @@ import (
 	"k8s.io/kops/pkg/apis/kops"
 	"k8s.io/kops/upup/pkg/fi/cloudup"
 
-	"github.com/epip-io/terraform-provider-kops/pkg/api"
+	"github.com/epip-io/terraform-provider-kops/pkg/convert"
 )
 
 type instanceGroupID struct {
@@ -27,8 +27,8 @@ func resourceInstanceGroupCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	instanceGroup, err := clientset.InstanceGroupsFor(cluster).Create(&kops.InstanceGroup{
-		ObjectMeta: api.MarshalObjectMeta(sectionData(d, "metadata")),
-		Spec:       api.MarshalInstanceGroupSpec(sectionData(d, "spec")),
+		ObjectMeta: convert.ExpandObjectMeta(sectionData(d, "metadata")),
+		Spec:       convert.ExpandInstanceGroupSpec(sectionData(d, "spec")),
 	})
 	if err != nil {
 		return err
@@ -62,10 +62,10 @@ func resourceInstanceGroupRead(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-	if err := d.Set("metadata", api.UnmarshalObjectMeta(instanceGroup.ObjectMeta)); err != nil {
+	if err := d.Set("metadata", convert.FlattenObjectMeta(instanceGroup.ObjectMeta)); err != nil {
 		return err
 	}
-	if err := d.Set("spec", api.UnmarshalInstanceGroupSpec(instanceGroup.Spec)); err != nil {
+	if err := d.Set("spec", convert.FlattenInstanceGroupSpec(instanceGroup.Spec)); err != nil {
 		return err
 	}
 	return nil
@@ -85,8 +85,8 @@ func resourceInstanceGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	_, err = clientset.InstanceGroupsFor(cluster).Update(&kops.InstanceGroup{
-		ObjectMeta: api.MarshalObjectMeta(sectionData(d, "metadata")),
-		Spec:       api.MarshalInstanceGroupSpec(sectionData(d, "spec")),
+		ObjectMeta: convert.ExpandObjectMeta(sectionData(d, "metadata")),
+		Spec:       convert.ExpandInstanceGroupSpec(sectionData(d, "spec")),
 	})
 	if err != nil {
 		return err

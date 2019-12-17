@@ -1,9 +1,9 @@
-{{- define "unmarshal.func" }}
+{{- define "flatten.func" }}
 {{- $_ := set . "Funcs" (append .Funcs .Type )}}
 {{- if .Top }}
-// Unmarshal{{ .Type | splitList "." | last | snakecase | camelcase }} exported as top level field
+// Flatten{{ .Type | splitList "." | last | snakecase | camelcase }} exported as top level field
 {{- end }}
-func {{ if .Top }}U{{ else }}u{{ end }}nmarshal{{ .Type | splitList "." | last | snakecase | camelcase -}}(d {{ if .IsSlice -}}
+func {{ if .Top }}F{{ else }}f{{ end }}latten{{ .Type | splitList "." | last | snakecase | camelcase -}}(d {{ if .IsSlice -}}
 	[]
 	{{- if .IsPtr -}}
 	*
@@ -20,7 +20,7 @@ func {{ if .Top }}U{{ else }}u{{ end }}nmarshal{{ .Type | splitList "." | last |
 	{{- else if or (eq .Kind "struct") .IsPtr }}
 		if i.{{ $n }} != nil {
 			item[{{ .Name | quote }}] = {{ if .Fields -}}
-				unmarshal{{ .Type | splitList "." | last | snakecase | camelcase }}({{- if (and $f.IsPtr (not $f.IsSlice)) }}*{{ end }}i.{{ $n }})
+				flatten{{ .Type | splitList "." | last | snakecase | camelcase }}({{- if (and $f.IsPtr (not $f.IsSlice)) }}*{{ end }}i.{{ $n }})
 		{{- else -}}
 			*i.{{ $n }}
 		{{- end }}
@@ -39,11 +39,11 @@ func {{ if .Top }}U{{ else }}u{{ end }}nmarshal{{ .Type | splitList "." | last |
 	{{ range $n, $f := .Fields }}
 		{{- if contains "ListMeta" $f.Type }}
 		{{- else if eq "HTTPProxy" $n }}
-	data[{{ .Name | quote }}] = unmarshalHttpProxy(d.{{ $n }})
+	data[{{ .Name | quote }}] = flattenHttpProxy(d.{{ $n }})
 		{{- else if (or (eq .Kind "struct") .IsPtr) }}
 	if d.{{ $n }}{{ if (contains "CreationTimestamp" $n) }}.String() != ""{{ else }} != nil{{ end }} {
 		data[{{ .Name | quote }}] = {{ if (eq .Kind "struct") -}}
-			unmarshal{{ .Type | splitList "." | last | snakecase | camelcase }}({{- if (and $f.IsPtr (not $f.IsSlice)) -}}*{{ end }}d.{{ $n }})
+			flatten{{ .Type | splitList "." | last | snakecase | camelcase }}({{- if (and $f.IsPtr (not $f.IsSlice)) -}}*{{ end }}d.{{ $n }})
 		{{- else -}}
 		*d.{{ $n }}
 		{{- end }}
@@ -61,7 +61,7 @@ func {{ if .Top }}U{{ else }}u{{ end }}nmarshal{{ .Type | splitList "." | last |
 		{{- if (and (not (contains "Duration" $f.Type)) (not (contains "Quantity" $f.Type))) }}
 			{{- if (and (not (contains "Time" $f.Type)) (not (eq $.Type $f.Type))) }}
 				{{- $_ := set $f "Funcs" $.Funcs }}
-{{ template "unmarshal.func" $f }}
+{{ template "flatten.func" $f }}
 				{{- $_ := set $ "Funcs" $f.Funcs }}
 			{{- end }}
 		{{- end }}
@@ -69,7 +69,7 @@ func {{ if .Top }}U{{ else }}u{{ end }}nmarshal{{ .Type | splitList "." | last |
 {{- end }}
 {{- end }}
 
-package api
+package convert
 
 import (
 	{{- if eq .Type "ObjectMeta"}}
@@ -79,4 +79,4 @@ import (
 	{{- end }}
 )
 {{- $_ := set $.Schema "Funcs" list }}
-{{ template "unmarshal.func" .Schema }}
+{{ template "flatten.func" .Schema }}

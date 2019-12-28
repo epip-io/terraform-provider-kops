@@ -1,24 +1,25 @@
 package provider
 
 import (
+	"log"
+
 	"github.com/hashicorp/terraform/helper/schema"
+
 	"k8s.io/apimachinery/pkg/api/errors"
+
 	"k8s.io/kops/pkg/apis/kops"
 	"k8s.io/kops/pkg/assets"
 	"k8s.io/kops/upup/pkg/fi/cloudup"
-	"log"
-
-	"github.com/epip-io/terraform-provider-kops/pkg/convert"
 )
 
 func resourceClusterCreate(d *schema.ResourceData, m interface{}) error {
 	clientset := m.(*ProviderConfig).clientset
 
 	log.Println("Expanding Metadata")
-	metadata := convert.ExpandObjectMeta(sectionData(d, "metadata"))
+	metadata := expandObjectMeta(sectionData(d, "metadata"))
 
 	log.Println("Expanding Cluster Spec")
-	spec := convert.ExpandClusterSpec(sectionData(d, "spec"))
+	spec := expandClusterSpec(sectionData(d, "spec"))
 
 	log.Println("Creating Cluster")
 	cluster, err := clientset.CreateCluster(&kops.Cluster{
@@ -56,10 +57,10 @@ func resourceClusterRead(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-	if err := d.Set("metadata", convert.FlattenObjectMeta(cluster.ObjectMeta)); err != nil {
+	if err := d.Set("metadata", flattenObjectMeta(cluster.ObjectMeta)); err != nil {
 		return err
 	}
-	if err := d.Set("spec", convert.FlattenClusterSpec(cluster.Spec)); err != nil {
+	if err := d.Set("spec", flattenClusterSpec(cluster.Spec)); err != nil {
 		return err
 	}
 	return nil
@@ -74,8 +75,8 @@ func resourceClusterUpdate(d *schema.ResourceData, m interface{}) error {
 	clientset := m.(*ProviderConfig).clientset
 
 	_, err := clientset.UpdateCluster(&kops.Cluster{
-		ObjectMeta: convert.ExpandObjectMeta(sectionData(d, "metadata")),
-		Spec:       convert.ExpandClusterSpec(sectionData(d, "spec")),
+		ObjectMeta: expandObjectMeta(sectionData(d, "metadata")),
+		Spec:       expandClusterSpec(sectionData(d, "spec")),
 	}, nil)
 
 	if err != nil {

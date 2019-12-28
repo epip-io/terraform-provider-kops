@@ -77,7 +77,7 @@ func (e *Engine) Renderer() (err error) {
 	e.initFuncMap(t)
 
 	for n, f := range e.Files {
-		if strings.HasPrefix(n, "_") {
+		if strings.HasPrefix(filepath.Base(n), "_") {
 			if _, err := t.New(n).Parse(f.Content); err != nil {
 				return cleanupParseError(n, err)
 			}

@@ -77,7 +77,7 @@ replace k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.0.0-20190819142756-1
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/Masterminds/sprig/v3 v3.0.2
-	github.com/fatih/structs v1.1.0
+	github.com/fatih/structs v1.1.0 // indirect
 	github.com/hashicorp/terraform v0.12.18
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
 	github.com/pkg/errors v0.8.0

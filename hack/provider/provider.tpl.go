@@ -2,9 +2,14 @@ package provider
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
+
+
 	"k8s.io/kops/pkg/client/simple"
 	"k8s.io/kops/pkg/client/simple/vfsclientset"
 	"k8s.io/kops/util/pkg/vfs"
@@ -16,6 +21,8 @@ Please use a valid s3 bucket uri on state_store attribute or KOPS_STATE_STORE en
 A valid value follows the format s3://<bucket>.
 Trailing slash will be trimmed.`
 )
+
+var emptyTime v1.Time
 
 // ProviderConfig kops provider config structure
 type ProviderConfig struct {
@@ -35,13 +42,13 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-{{- range .Resources }}
-			"kops_{{ . | snakecase }}": datasource{{ . }}(),
+{{- range $n, $_ := .Resources }}
+			"kops_{{ $n | snakecase }}": datasource{{ $n }}(),
 {{- end }}
 		},
 		ResourcesMap: map[string]*schema.Resource{
-{{- range .Resources }}
-			"kops_{{ . | snakecase }}": resource{{ . }}(),
+{{- range $n, $_ := .Resources }}
+			"kops_{{ $n | snakecase }}": resource{{ $n }}(),
 {{- end }}
 		},
 		ConfigureFunc: configureProvider,

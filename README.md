@@ -8,7 +8,7 @@ Terraform providers are installed into the users [Terraform plugin](https://www.
 
 ```bash
 mkdir -p ~/terraform.d/plugins/
-go build -mod vendor -o ~/terraform.d/plugins/$(basename $(pwd))_$(git describe --exact-match --match 'v*')
+go build -mod vendor -o ~/.terraform.d/plugins/$(basename $(pwd))_$(git describe --exact-match --match 'v*')
 ```
 
 ## Notes
@@ -18,7 +18,7 @@ go build -mod vendor -o ~/terraform.d/plugins/$(basename $(pwd))_$(git describe 
   
   ```go-bindata -pkg models -prefix $(pwd) -prefix upup/models cloudup/... nodeup/...```
 
-  (`go-bindata` is gotten using `go get -u github.com/jteeuwen/^C-bindata/go-bindata`)
+  (`go-bindata` is gotten using `go get -u github.com/jteeuwen/go-bindata/go-bindata`)
 
 ## Links
 

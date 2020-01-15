@@ -1,4 +1,4 @@
-name: pull-request-testing
+name: terraform-provider-kops -> Test & Build
 on: 
   pull_request:
     branches:
@@ -16,7 +16,8 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v1
       - name: Generate code
         run: go generate
-      - run: go build -mod vendor
+      - name: Build
+        run: go build -mod vendor

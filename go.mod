@@ -82,6 +82,7 @@ require (
 	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
 	github.com/pkg/errors v0.8.0
 	k8s.io/apimachinery v0.0.0
+	k8s.io/klog v0.3.1
 	k8s.io/kops v0.0.0-00010101000000-000000000000
 	sigs.k8s.io/yaml v1.1.0
 )

@@ -97,7 +97,6 @@ func main() {
 		}
 		return r
 	}(tplAbsDir, fs))
-	tr.AddRender("values.yaml", tplAbsDir+"/values.yaml", v)
 
 	for n, r := range resources.Resources {
 		v := make(map[string]interface{})

@@ -5,6 +5,7 @@
 {{- end }}
 
 {{- define "resource.schema" }}
+
 func schema{{ .Name }}() *schema.Schema {
 	return &schema.Schema{
 		Type: schema.Type{{ .Type }},
@@ -33,4 +34,4 @@ func schema{{ .Name }}() *schema.Schema {
 	{{- end }}
 	}
 }
-{{ end }}
+{{- end }}

@@ -15,5 +15,4 @@
 terraform-provider-kops
 
 # Project generated files
-*.gen.go
 vendor

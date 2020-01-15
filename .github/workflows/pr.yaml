@@ -9,12 +9,14 @@ jobs:
     strategy:
       matrix:
         go: [ '1.12', '1.13' ]
-    name: Go ${{ matrix.go }} sample
+    name: Go ${{ matrix.go }}
     steps:
-      - uses: actions/checkout@master
       - name: Setup go
         uses: actions/setup-go@v1
         with:
           go-version: ${{ matrix.go }}
-      - run: go generate
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Generate code
+        run: go generate
       - run: go build -mod vendor

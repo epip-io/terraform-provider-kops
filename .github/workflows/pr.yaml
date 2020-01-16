@@ -17,8 +17,6 @@ jobs:
         go-version: ${{ matrix.go }}
     - name: Checkout code
       uses: actions/checkout@v1
-    - name: Generate code
-      run: go generate
     - name: Create release dry-run
       uses: docker://goreleaser/goreleaser:latest
       with:

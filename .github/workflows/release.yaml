@@ -1,8 +1,10 @@
 on:
-  create:
+  push:
+    branches:
+      - "!*"
     tags:
       - v*.*.*
-name: Release
+name: terraform-provider-kops -> Release
 jobs:
   release:
     name: Release on GitHub

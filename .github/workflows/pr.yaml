@@ -19,6 +19,6 @@ jobs:
     - name: Create release dry-run
       uses: docker://goreleaser/goreleaser:latest
       with:
-        args: release --skip-publish
+        args: release --skip-publish --snapshot
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

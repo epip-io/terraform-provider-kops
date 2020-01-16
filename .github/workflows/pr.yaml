@@ -11,13 +11,17 @@ jobs:
         go: [ '1.12', '1.13' ]
     name: Go ${{ matrix.go }}
     steps:
-      - name: Setup go
-        uses: actions/setup-go@v1
-        with:
-          go-version: ${{ matrix.go }}
-      - name: Checkout code
-        uses: actions/checkout@v1
-      - name: Generate code
-        run: go generate
-      - name: Build
-        run: go build -mod vendor
+    - name: Setup go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Generate code
+      run: go generate
+    - name: Create release dry-run
+      uses: docker://goreleaser/goreleaser:latest
+      with:
+        args: release --skip-publish
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

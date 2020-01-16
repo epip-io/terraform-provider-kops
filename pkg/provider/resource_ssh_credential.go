@@ -52,7 +52,12 @@ func resourceSSHCredentialCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	d.SetId(sshc.ObjectMeta.Name)
+	fingerprint, err := sshcredentials.Fingerprint(sshc.Spec.PublicKey)
+	if err != nil {
+		klog.Error("unable to compute fingerprint for public key")
+	}
+
+	d.SetId(fingerprint)
 
 	return resourceSSHCredentialRead(d, m)
 }
@@ -72,7 +77,7 @@ func resourceSSHCredentialRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceSSHCredentialUpdate(d *schema.ResourceData, m interface{}) error {
-	return nil
+	return resourceSSHCredentialRead(d, m)
 }
 
 func resourceSSHCredentialDelete(d *schema.ResourceData, m interface{}) error {

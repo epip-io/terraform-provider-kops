@@ -149,6 +149,12 @@ func main() {
 		fmt.Sprintf("%s/provider/provider.gen.go", outAbsDir),
 		fmt.Sprintf("%s/provider.tpl.go", tplAbsDir),
 		v,
+	)	
+	
+	tr.AddRender(
+		fmt.Sprintf("%s/values.yaml", outAbsDir),
+		fmt.Sprintf("%s/values.yaml", tplAbsDir),
+		v,
 	)
 
 	tr.Renderer()
@@ -407,6 +413,7 @@ func (rs Resources) BuildSchema(e *Elem, f *reflect.StructField) error {
 			Elems:    rs.BuildSchemaElems(f.Type),
 			Required: rs.IsSchemaRequired(fTag),
 			Type:     rs.BuildSchemaType(f.Type),
+			SubType:  rs.GetSubType(f.Type),
 		}
 		rs.Schemas[sName] = e.Schema
 	}
@@ -445,6 +452,22 @@ func (rs Resources) BuildSchemaElems(t reflect.Type) map[string]*Elem {
 	}
 
 	return r
+}
+
+func (rs Resources) GetSubType(t reflect.Type) string {
+	if t.Kind() == reflect.Ptr {
+		return rs.GetSubType(t.Elem())
+	}
+
+	if t.Kind() == reflect.Slice || t.Kind() == reflect.Map {
+		if t.Elem().Kind() == reflect.Slice {
+			return "list"
+		}
+
+		return t.Elem().Kind().String()
+	}
+
+	return ""
 }
 
 func (rs Resources) BuildSchemaName(t reflect.Type, tag string) string {

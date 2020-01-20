@@ -28,8 +28,24 @@ func schema{{ .Name }}() *schema.Schema {
 			},
 		},
 	{{- else if .SubType }}
+		{{- if eq .SubType "list" }}
 		Elem: &schema.Schema{
-			Type : schema.Type{{ .SubType }},
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
+		{{- else }}
+		Elem: &schema.Schema{
+			Type : schema.Type{{ camelcase .SubType }},
+		},
+		{{- end }}
+	{{- else if (and (eq .Type "List") (eq .SubType "")) }}
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
 		},
 	{{- end }}
 	}

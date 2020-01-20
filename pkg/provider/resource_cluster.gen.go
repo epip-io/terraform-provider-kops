@@ -72,6 +72,12 @@ func schemaAlwaysAllowAuthorizationSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -304,6 +310,12 @@ func schemaClassicNetworkingSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -448,6 +460,12 @@ func schemaDNSAccessSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -631,6 +649,12 @@ func schemaExternalNetworkingSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -665,6 +689,12 @@ func schemaGCENetworkingSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -713,6 +743,12 @@ func schemaKopeioAuthenticationSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -721,6 +757,12 @@ func schemaKopeioNetworkingSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -951,6 +993,12 @@ func schemaKubenetNetworkingSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -959,6 +1007,12 @@ func schemaKuberouterNetworkingSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -1190,6 +1244,9 @@ func schemaOptionalInstanceGroupRoleSlice() *schema.Schema {
 	return &schema.Schema{
 		Type: schema.TypeList,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeString,
+		},
 	}
 }
 
@@ -1218,6 +1275,12 @@ func schemaOptionalStringSliceMap() *schema.Schema {
 	return &schema.Schema{
 		Type: schema.TypeMap,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -1252,6 +1315,12 @@ func schemaRBACAuthorizationSpec() *schema.Schema {
 		Type: schema.TypeList,
 		MaxItems: 1,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeList,
+			Elem: &schema.Schema{
+				Type : schema.TypeString,
+			},
+		},
 	}
 }
 

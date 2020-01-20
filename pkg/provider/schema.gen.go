@@ -221,6 +221,9 @@ func schemaOptionalStringMap() *schema.Schema {
 	return &schema.Schema{
 		Type: schema.TypeMap,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeString,
+		},
 	}
 }
 
@@ -228,6 +231,9 @@ func schemaOptionalStringSlice() *schema.Schema {
 	return &schema.Schema{
 		Type: schema.TypeList,
 		Optional: true,
+		Elem: &schema.Schema{
+			Type : schema.TypeString,
+		},
 	}
 }
 

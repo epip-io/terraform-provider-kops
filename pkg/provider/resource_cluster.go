@@ -114,6 +114,6 @@ func getCluster(d *schema.ResourceData, m interface{}) (*kops.Cluster, error) {
 	return cluster, err
 }
 
-func sectionData(d *schema.ResourceData, section string) map[string]interface{} {
-	return d.Get(section).([]interface{})[0].(map[string]interface{})
+func sectionData(d *schema.ResourceData, section string) interface{} {
+	return d.Get(section)
 }

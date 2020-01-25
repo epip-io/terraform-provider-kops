@@ -1,0 +1,23 @@
+name: terraform-provider-kops -> Test & Build
+on: 
+  pull_request:
+    branches:
+    - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ '1.13' ]
+    name: Go ${{ matrix.go }}
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Checkout code
+        uses: actions/checkout@v1
+      - name: Generate code
+        run: go generate
+      - name: Build
+        run: go build -mod vendor

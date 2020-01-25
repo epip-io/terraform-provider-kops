@@ -8,2884 +8,4266 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
-func expandAccessSpec(in interface{}) *kops.AccessSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.AccessSpec{}
+func expandAccessSpec(in interface{}) (kops.AccessSpec, bool) {
+	d := in.([]interface{})
+	out := kops.AccessSpec{}
 
-	if v, ok := d["dns"]; ok {
-		out.DNS = expandDNSAccessSpec(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["load_balancer"]; ok {
-		out.LoadBalancer = expandLoadBalancerAccessSpec(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["dns"]; ok {
+		if value, e := expandDNSAccessSpec(v); !e {
+      out.DNS = &value
+    }
 	}
 
-	return out
+	if v, ok := m["load_balancer"]; ok {
+		if value, e := expandLoadBalancerAccessSpec(v); !e {
+      out.LoadBalancer = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandAddonSpecSlice(in interface{}) []kops.AddonSpec {
+func expandAddonSpecSlice(in interface{}) ([]kops.AddonSpec, bool) {
 	d := in.([]interface{})
 	out := make([]kops.AddonSpec , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = kops.AddonSpec{}
 
 		if v, ok := d[i].(map[string]interface{})["manifest"]; ok {
-			out[i].Manifest = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Manifest = value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandAlwaysAllowAuthorizationSpec(in interface{}) *kops.AlwaysAllowAuthorizationSpec {
-	out := in.(*kops.AlwaysAllowAuthorizationSpec)
+func expandAlwaysAllowAuthorizationSpec(in interface{}) (kops.AlwaysAllowAuthorizationSpec, bool) {
+	out := kops.AlwaysAllowAuthorizationSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
 
-	return out
+	return out, false
 }
 
-func expandAmazonVPCNetworkingSpec(in interface{}) *kops.AmazonVPCNetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.AmazonVPCNetworkingSpec{}
+func expandAmazonVPCNetworkingSpec(in interface{}) (kops.AmazonVPCNetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.AmazonVPCNetworkingSpec{}
 
-	if v, ok := d["image_name"]; ok {
-		out.ImageName = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["image_name"]; ok {
+		if value, e := expandString(v); !e {
+      out.ImageName = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandAssets(in interface{}) *kops.Assets {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.Assets{}
+func expandAssets(in interface{}) (kops.Assets, bool) {
+	d := in.([]interface{})
+	out := kops.Assets{}
 
-	if v, ok := d["container_proxy"]; ok {
-		value := expandString(v)
-
-		out.ContainerProxy = &value
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["container_registry"]; ok {
-		value := expandString(v)
+	m := d[0].(map[string]interface{})
 
-		out.ContainerRegistry = &value
+	if v, ok := m["container_proxy"]; ok {
+		if value, e := expandString(v); !e {
+      out.ContainerProxy = &value
+    }
 	}
 
-	if v, ok := d["file_repository"]; ok {
-		value := expandString(v)
-
-		out.FileRepository = &value
+	if v, ok := m["container_registry"]; ok {
+		if value, e := expandString(v); !e {
+      out.ContainerRegistry = &value
+    }
 	}
 
-	return out
+	if v, ok := m["file_repository"]; ok {
+		if value, e := expandString(v); !e {
+      out.FileRepository = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandAuthenticationSpec(in interface{}) *kops.AuthenticationSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.AuthenticationSpec{}
+func expandAuthenticationSpec(in interface{}) (kops.AuthenticationSpec, bool) {
+	d := in.([]interface{})
+	out := kops.AuthenticationSpec{}
 
-	if v, ok := d["aws"]; ok {
-		out.Aws = expandAwsAuthenticationSpec(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["kopeio"]; ok {
-		out.Kopeio = expandKopeioAuthenticationSpec(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["aws"]; ok {
+		if value, e := expandAwsAuthenticationSpec(v); !e {
+      out.Aws = &value
+    }
 	}
 
-	return out
+	if v, ok := m["kopeio"]; ok {
+		if value, e := expandKopeioAuthenticationSpec(v); !e {
+      out.Kopeio = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandAuthorizationSpec(in interface{}) *kops.AuthorizationSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.AuthorizationSpec{}
+func expandAuthorizationSpec(in interface{}) (kops.AuthorizationSpec, bool) {
+	d := in.([]interface{})
+	out := kops.AuthorizationSpec{}
 
-	if v, ok := d["always_allow"]; ok {
-		out.AlwaysAllow = expandAlwaysAllowAuthorizationSpec(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["rbac"]; ok {
-		out.RBAC = expandRBACAuthorizationSpec(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["always_allow"]; ok {
+		if value, e := expandAlwaysAllowAuthorizationSpec(v); !e {
+      out.AlwaysAllow = &value
+    }
 	}
 
-	return out
+	if v, ok := m["rbac"]; ok {
+		if value, e := expandRBACAuthorizationSpec(v); !e {
+      out.RBAC = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandAwsAuthenticationSpec(in interface{}) *kops.AwsAuthenticationSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.AwsAuthenticationSpec{}
+func expandAwsAuthenticationSpec(in interface{}) (kops.AwsAuthenticationSpec, bool) {
+	d := in.([]interface{})
+	out := kops.AwsAuthenticationSpec{}
 
-	if v, ok := d["cpu_limit"]; ok {
-		out.CPULimit = expandQuantity(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["cpu_request"]; ok {
-		out.CPURequest = expandQuantity(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["cpu_limit"]; ok {
+		if value, e := expandQuantity(v); !e {
+      out.CPULimit = &value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["cpu_request"]; ok {
+		if value, e := expandQuantity(v); !e {
+      out.CPURequest = &value
+    }
 	}
 
-	if v, ok := d["memory_limit"]; ok {
-		out.MemoryLimit = expandQuantity(v)
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["memory_request"]; ok {
-		out.MemoryRequest = expandQuantity(v)
+	if v, ok := m["memory_limit"]; ok {
+		if value, e := expandQuantity(v); !e {
+      out.MemoryLimit = &value
+    }
 	}
 
-	return out
+	if v, ok := m["memory_request"]; ok {
+		if value, e := expandQuantity(v); !e {
+      out.MemoryRequest = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandBastionSpec(in interface{}) *kops.BastionSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.BastionSpec{}
+func expandBastionSpec(in interface{}) (kops.BastionSpec, bool) {
+	d := in.([]interface{})
+	out := kops.BastionSpec{}
 
-	if v, ok := d["bastion_public_name"]; ok {
-		out.BastionPublicName = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["idle_timeout_seconds"]; ok {
-		value := expandInt64(v)
+	m := d[0].(map[string]interface{})
 
-		out.IdleTimeoutSeconds = &value
+	if v, ok := m["bastion_public_name"]; ok {
+		if value, e := expandString(v); !e {
+      out.BastionPublicName = value
+    }
 	}
 
-	return out
+	if v, ok := m["idle_timeout_seconds"]; ok {
+		if value, e := expandInt64(v); !e {
+      out.IdleTimeoutSeconds = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandCNINetworkingSpec(in interface{}) *kops.CNINetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.CNINetworkingSpec{}
+func expandCNINetworkingSpec(in interface{}) (kops.CNINetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.CNINetworkingSpec{}
 
-	if v, ok := d["uses_secondary_ip"]; ok {
-		value := expandBool(v)
-
-		out.UsesSecondaryIP = (*value)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["uses_secondary_ip"]; ok {
+		if value, e := expandBool(v); !e {
+      out.UsesSecondaryIP = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandCalicoNetworkingSpec(in interface{}) *kops.CalicoNetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.CalicoNetworkingSpec{}
+func expandCalicoNetworkingSpec(in interface{}) (kops.CalicoNetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.CalicoNetworkingSpec{}
 
-	if v, ok := d["cross_subnet"]; ok {
-		value := expandBool(v)
-
-		out.CrossSubnet = (*value)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["ipip_mode"]; ok {
-		out.IPIPMode = expandString(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["cross_subnet"]; ok {
+		if value, e := expandBool(v); !e {
+      out.CrossSubnet = value
+    }
 	}
 
-	if v, ok := d["log_severity_screen"]; ok {
-		out.LogSeverityScreen = expandString(v)
+	if v, ok := m["ipip_mode"]; ok {
+		if value, e := expandString(v); !e {
+      out.IPIPMode = value
+    }
 	}
 
-	if v, ok := d["mtu"]; ok {
-		value := expandInt32(v)
-
-		out.MTU = &value
+	if v, ok := m["log_severity_screen"]; ok {
+		if value, e := expandString(v); !e {
+      out.LogSeverityScreen = value
+    }
 	}
 
-	if v, ok := d["major_version"]; ok {
-		out.MajorVersion = expandString(v)
+	if v, ok := m["mtu"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MTU = &value
+    }
 	}
 
-	if v, ok := d["prometheus_go_metrics_enabled"]; ok {
-		value := expandBool(v)
-
-		out.PrometheusGoMetricsEnabled = (*value)
+	if v, ok := m["major_version"]; ok {
+		if value, e := expandString(v); !e {
+      out.MajorVersion = value
+    }
 	}
 
-	if v, ok := d["prometheus_metrics_enabled"]; ok {
-		value := expandBool(v)
-
-		out.PrometheusMetricsEnabled = (*value)
+	if v, ok := m["prometheus_go_metrics_enabled"]; ok {
+		if value, e := expandBool(v); !e {
+      out.PrometheusGoMetricsEnabled = value
+    }
 	}
 
-	if v, ok := d["prometheus_metrics_port"]; ok {
-		out.PrometheusMetricsPort = expandInt32(v)
+	if v, ok := m["prometheus_metrics_enabled"]; ok {
+		if value, e := expandBool(v); !e {
+      out.PrometheusMetricsEnabled = value
+    }
 	}
 
-	if v, ok := d["prometheus_process_metrics_enabled"]; ok {
-		value := expandBool(v)
-
-		out.PrometheusProcessMetricsEnabled = (*value)
+	if v, ok := m["prometheus_metrics_port"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.PrometheusMetricsPort = value
+    }
 	}
 
-	if v, ok := d["typha_prometheus_metrics_enabled"]; ok {
-		value := expandBool(v)
-
-		out.TyphaPrometheusMetricsEnabled = (*value)
+	if v, ok := m["prometheus_process_metrics_enabled"]; ok {
+		if value, e := expandBool(v); !e {
+      out.PrometheusProcessMetricsEnabled = value
+    }
 	}
 
-	if v, ok := d["typha_prometheus_metrics_port"]; ok {
-		out.TyphaPrometheusMetricsPort = expandInt32(v)
+	if v, ok := m["typha_prometheus_metrics_enabled"]; ok {
+		if value, e := expandBool(v); !e {
+      out.TyphaPrometheusMetricsEnabled = value
+    }
 	}
 
-	if v, ok := d["typha_replicas"]; ok {
-		out.TyphaReplicas = expandInt32(v)
+	if v, ok := m["typha_prometheus_metrics_port"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.TyphaPrometheusMetricsPort = value
+    }
 	}
 
-	return out
+	if v, ok := m["typha_replicas"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.TyphaReplicas = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandCanalNetworkingSpec(in interface{}) *kops.CanalNetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.CanalNetworkingSpec{}
+func expandCanalNetworkingSpec(in interface{}) (kops.CanalNetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.CanalNetworkingSpec{}
 
-	if v, ok := d["chain_insert_mode"]; ok {
-		out.ChainInsertMode = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["default_endpoint_to_host_action"]; ok {
-		out.DefaultEndpointToHostAction = expandString(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["chain_insert_mode"]; ok {
+		if value, e := expandString(v); !e {
+      out.ChainInsertMode = value
+    }
 	}
 
-	if v, ok := d["disable_flannel_forward_rules"]; ok {
-		value := expandBool(v)
-
-		out.DisableFlannelForwardRules = (*value)
+	if v, ok := m["default_endpoint_to_host_action"]; ok {
+		if value, e := expandString(v); !e {
+      out.DefaultEndpointToHostAction = value
+    }
 	}
 
-	if v, ok := d["log_severity_sys"]; ok {
-		out.LogSeveritySys = expandString(v)
+	if v, ok := m["disable_flannel_forward_rules"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DisableFlannelForwardRules = value
+    }
 	}
 
-	if v, ok := d["mtu"]; ok {
-		value := expandInt32(v)
-
-		out.MTU = &value
+	if v, ok := m["log_severity_sys"]; ok {
+		if value, e := expandString(v); !e {
+      out.LogSeveritySys = value
+    }
 	}
 
-	if v, ok := d["prometheus_go_metrics_enabled"]; ok {
-		value := expandBool(v)
-
-		out.PrometheusGoMetricsEnabled = (*value)
+	if v, ok := m["mtu"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MTU = &value
+    }
 	}
 
-	if v, ok := d["prometheus_metrics_enabled"]; ok {
-		value := expandBool(v)
-
-		out.PrometheusMetricsEnabled = (*value)
+	if v, ok := m["prometheus_go_metrics_enabled"]; ok {
+		if value, e := expandBool(v); !e {
+      out.PrometheusGoMetricsEnabled = value
+    }
 	}
 
-	if v, ok := d["prometheus_metrics_port"]; ok {
-		out.PrometheusMetricsPort = expandInt32(v)
+	if v, ok := m["prometheus_metrics_enabled"]; ok {
+		if value, e := expandBool(v); !e {
+      out.PrometheusMetricsEnabled = value
+    }
 	}
 
-	if v, ok := d["prometheus_process_metrics_enabled"]; ok {
-		value := expandBool(v)
-
-		out.PrometheusProcessMetricsEnabled = (*value)
+	if v, ok := m["prometheus_metrics_port"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.PrometheusMetricsPort = value
+    }
 	}
 
-	return out
+	if v, ok := m["prometheus_process_metrics_enabled"]; ok {
+		if value, e := expandBool(v); !e {
+      out.PrometheusProcessMetricsEnabled = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandCauseType(in interface{}) v1.CauseType {
-	out := in.(v1.CauseType)
+func expandCauseType(in interface{}) (v1.CauseType, bool) {
+	d := in.(string)
+	r := v1.CauseType(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandCiliumNetworkingSpec(in interface{}) *kops.CiliumNetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.CiliumNetworkingSpec{}
+func expandCiliumNetworkingSpec(in interface{}) (kops.CiliumNetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.CiliumNetworkingSpec{}
 
-	if v, ok := d["access_log"]; ok {
-		out.AccessLog = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["agent_labels"]; ok {
-		out.AgentLabels = expandStringSlice(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["access_log"]; ok {
+		if value, e := expandString(v); !e {
+      out.AccessLog = value
+    }
 	}
 
-	if v, ok := d["allow_localhost"]; ok {
-		out.AllowLocalhost = expandString(v)
+	if v, ok := m["agent_labels"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.AgentLabels = value
+    }
 	}
 
-	{
-		value := expandBool(d["auto_direct_node_routes"])
-
-		out.AutoDirectNodeRoutes = (*value)
-	}
-
-	if v, ok := d["auto_ipv_6node_routes"]; ok {
-		value := expandBool(v)
-
-		out.AutoIpv6NodeRoutes = (*value)
-	}
-
-	{
-		out.BPFCTGlobalAnyMax = expandInt(d["bpf_ct_global_any_max"])
+	if v, ok := m["allow_localhost"]; ok {
+		if value, e := expandString(v); !e {
+      out.AllowLocalhost = value
+    }
 	}
 
 	{
-		out.BPFCTGlobalTCPMax = expandInt(d["bpf_ct_global_tcp_max"])
+		if value, e := expandBool(m["auto_direct_node_routes"]); !e {
+      out.AutoDirectNodeRoutes = value
+    }
 	}
 
-	if v, ok := d["bpf_root"]; ok {
-		out.BPFRoot = expandString(v)
-	}
-
-	{
-		out.ClusterName = expandString(d["cluster_name"])
-	}
-
-	{
-		out.CniBinPath = expandString(d["cni_bin_path"])
-	}
-
-	if v, ok := d["container_runtime"]; ok {
-		out.ContainerRuntime = expandStringSlice(v)
-	}
-
-	if v, ok := d["container_runtime_endpoint"]; ok {
-		out.ContainerRuntimeEndpoint = expandStringMap(v)
-	}
-
-	if v, ok := d["container_runtime_labels"]; ok {
-		out.ContainerRuntimeLabels = expandString(v)
-	}
-
-	if v, ok := d["debug"]; ok {
-		value := expandBool(v)
-
-		out.Debug = (*value)
-	}
-
-	if v, ok := d["debug_verbose"]; ok {
-		out.DebugVerbose = expandStringSlice(v)
-	}
-
-	if v, ok := d["device"]; ok {
-		out.Device = expandString(v)
-	}
-
-	if v, ok := d["disable_conntrack"]; ok {
-		value := expandBool(v)
-
-		out.DisableConntrack = (*value)
-	}
-
-	if v, ok := d["disable_ipv_4"]; ok {
-		value := expandBool(v)
-
-		out.DisableIpv4 = (*value)
-	}
-
-	if v, ok := d["disable_k8s_services"]; ok {
-		value := expandBool(v)
-
-		out.DisableK8sServices = (*value)
-	}
-
-	if v, ok := d["disable_masquerade"]; ok {
-		value := expandBool(v)
-
-		out.DisableMasquerade = (*value)
+	if v, ok := m["auto_ipv_6node_routes"]; ok {
+		if value, e := expandBool(v); !e {
+      out.AutoIpv6NodeRoutes = value
+    }
 	}
 
 	{
-		value := expandBool(d["enableipv_4"])
-
-		out.EnableIpv4 = (*value)
+		if value, e := expandInt(m["bpf_ct_global_any_max"]); !e {
+      out.BPFCTGlobalAnyMax = value
+    }
 	}
 
 	{
-		value := expandBool(d["enableipv_6"])
+		if value, e := expandInt(m["bpf_ct_global_tcp_max"]); !e {
+      out.BPFCTGlobalTCPMax = value
+    }
+	}
 
-		out.EnableIpv6 = (*value)
+	if v, ok := m["bpf_root"]; ok {
+		if value, e := expandString(v); !e {
+      out.BPFRoot = value
+    }
 	}
 
 	{
-		value := expandBool(d["enable_node_port"])
-
-		out.EnableNodePort = (*value)
-	}
-
-	if v, ok := d["enable_policy"]; ok {
-		out.EnablePolicy = expandString(v)
-	}
-
-	if v, ok := d["enable_tracing"]; ok {
-		value := expandBool(v)
-
-		out.EnableTracing = (*value)
-	}
-
-	if v, ok := d["envoy_log"]; ok {
-		out.EnvoyLog = expandString(v)
+		if value, e := expandString(m["cluster_name"]); !e {
+      out.ClusterName = value
+    }
 	}
 
 	{
-		value := expandBool(d["ip_tables_rules_noinstall"])
-
-		out.IPTablesRulesNoinstall = (*value)
+		if value, e := expandString(m["cni_bin_path"]); !e {
+      out.CniBinPath = value
+    }
 	}
 
-	if v, ok := d["ipv_4cluster_cidr_mask_size"]; ok {
-		out.Ipv4ClusterCIDRMaskSize = expandInt(v)
+	if v, ok := m["container_runtime"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.ContainerRuntime = value
+    }
 	}
 
-	if v, ok := d["ipv_4node"]; ok {
-		out.Ipv4Node = expandString(v)
+	if v, ok := m["container_runtime_endpoint"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.ContainerRuntimeEndpoint = value
+    }
 	}
 
-	if v, ok := d["ipv_4range"]; ok {
-		out.Ipv4Range = expandString(v)
+	if v, ok := m["container_runtime_labels"]; ok {
+		if value, e := expandString(v); !e {
+      out.ContainerRuntimeLabels = value
+    }
 	}
 
-	if v, ok := d["ipv_4service_range"]; ok {
-		out.Ipv4ServiceRange = expandString(v)
+	if v, ok := m["debug"]; ok {
+		if value, e := expandBool(v); !e {
+      out.Debug = value
+    }
 	}
 
-	if v, ok := d["ipv_6cluster_alloc_cidr"]; ok {
-		out.Ipv6ClusterAllocCidr = expandString(v)
+	if v, ok := m["debug_verbose"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.DebugVerbose = value
+    }
 	}
 
-	if v, ok := d["ipv_6node"]; ok {
-		out.Ipv6Node = expandString(v)
+	if v, ok := m["device"]; ok {
+		if value, e := expandString(v); !e {
+      out.Device = value
+    }
 	}
 
-	if v, ok := d["ipv_6range"]; ok {
-		out.Ipv6Range = expandString(v)
+	if v, ok := m["disable_conntrack"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DisableConntrack = value
+    }
 	}
 
-	if v, ok := d["ipv_6service_range"]; ok {
-		out.Ipv6ServiceRange = expandString(v)
+	if v, ok := m["disable_ipv_4"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DisableIpv4 = value
+    }
 	}
 
-	if v, ok := d["k_8s_api_server"]; ok {
-		out.K8sAPIServer = expandString(v)
+	if v, ok := m["disable_k8s_services"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DisableK8sServices = value
+    }
 	}
 
-	if v, ok := d["k_8s_kubeconfig_path"]; ok {
-		out.K8sKubeconfigPath = expandString(v)
-	}
-
-	if v, ok := d["keep_bpf_templates"]; ok {
-		value := expandBool(v)
-
-		out.KeepBPFTemplates = (*value)
-	}
-
-	if v, ok := d["keep_config"]; ok {
-		value := expandBool(v)
-
-		out.KeepConfig = (*value)
-	}
-
-	if v, ok := d["lb"]; ok {
-		out.LB = expandString(v)
-	}
-
-	if v, ok := d["label_prefix_file"]; ok {
-		out.LabelPrefixFile = expandString(v)
-	}
-
-	if v, ok := d["labels"]; ok {
-		out.Labels = expandStringSlice(v)
-	}
-
-	if v, ok := d["lib_dir"]; ok {
-		out.LibDir = expandString(v)
-	}
-
-	if v, ok := d["log_driver"]; ok {
-		out.LogDrivers = expandStringSlice(v)
-	}
-
-	if v, ok := d["log_opt"]; ok {
-		out.LogOpt = expandStringMap(v)
-	}
-
-	if v, ok := d["logstash"]; ok {
-		value := expandBool(v)
-
-		out.Logstash = (*value)
-	}
-
-	if v, ok := d["logstash_agent"]; ok {
-		out.LogstashAgent = expandString(v)
-	}
-
-	if v, ok := d["logstash_probe_timer"]; ok {
-		out.LogstashProbeTimer = expandUint32(v)
+	if v, ok := m["disable_masquerade"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DisableMasquerade = value
+    }
 	}
 
 	{
-		out.MonitorAggregation = expandString(d["monitor_aggregation"])
-	}
-
-	if v, ok := d["nat_46range"]; ok {
-		out.Nat46Range = expandString(v)
-	}
-
-	{
-		out.NodeInitBootstrapFile = expandString(d["node_init_bootstrap_file"])
-	}
-
-	if v, ok := d["pprof"]; ok {
-		value := expandBool(v)
-
-		out.Pprof = (*value)
+		if value, e := expandBool(m["enableipv_4"]); !e {
+      out.EnableIpv4 = value
+    }
 	}
 
 	{
-		value := expandBool(d["preallocate_bpf_maps"])
-
-		out.PreallocateBPFMaps = (*value)
-	}
-
-	if v, ok := d["prefilter_device"]; ok {
-		out.PrefilterDevice = expandString(v)
-	}
-
-	if v, ok := d["prometheus_serve_addr"]; ok {
-		out.PrometheusServeAddr = expandString(v)
+		if value, e := expandBool(m["enableipv_6"]); !e {
+      out.EnableIpv6 = value
+    }
 	}
 
 	{
-		value := expandBool(d["reconfigure_kubelet"])
+		if value, e := expandBool(m["enable_node_port"]); !e {
+      out.EnableNodePort = value
+    }
+	}
 
-		out.ReconfigureKubelet = (*value)
+	if v, ok := m["enable_policy"]; ok {
+		if value, e := expandString(v); !e {
+      out.EnablePolicy = value
+    }
+	}
+
+	if v, ok := m["enable_tracing"]; ok {
+		if value, e := expandBool(v); !e {
+      out.EnableTracing = value
+    }
+	}
+
+	if v, ok := m["envoy_log"]; ok {
+		if value, e := expandString(v); !e {
+      out.EnvoyLog = value
+    }
 	}
 
 	{
-		value := expandBool(d["remove_cbr_bridge"])
+		if value, e := expandBool(m["ip_tables_rules_noinstall"]); !e {
+      out.IPTablesRulesNoinstall = value
+    }
+	}
 
-		out.RemoveCbrBridge = (*value)
+	if v, ok := m["ipv_4cluster_cidr_mask_size"]; ok {
+		if value, e := expandInt(v); !e {
+      out.Ipv4ClusterCIDRMaskSize = value
+    }
+	}
+
+	if v, ok := m["ipv_4node"]; ok {
+		if value, e := expandString(v); !e {
+      out.Ipv4Node = value
+    }
+	}
+
+	if v, ok := m["ipv_4range"]; ok {
+		if value, e := expandString(v); !e {
+      out.Ipv4Range = value
+    }
+	}
+
+	if v, ok := m["ipv_4service_range"]; ok {
+		if value, e := expandString(v); !e {
+      out.Ipv4ServiceRange = value
+    }
+	}
+
+	if v, ok := m["ipv_6cluster_alloc_cidr"]; ok {
+		if value, e := expandString(v); !e {
+      out.Ipv6ClusterAllocCidr = value
+    }
+	}
+
+	if v, ok := m["ipv_6node"]; ok {
+		if value, e := expandString(v); !e {
+      out.Ipv6Node = value
+    }
+	}
+
+	if v, ok := m["ipv_6range"]; ok {
+		if value, e := expandString(v); !e {
+      out.Ipv6Range = value
+    }
+	}
+
+	if v, ok := m["ipv_6service_range"]; ok {
+		if value, e := expandString(v); !e {
+      out.Ipv6ServiceRange = value
+    }
+	}
+
+	if v, ok := m["k_8s_api_server"]; ok {
+		if value, e := expandString(v); !e {
+      out.K8sAPIServer = value
+    }
+	}
+
+	if v, ok := m["k_8s_kubeconfig_path"]; ok {
+		if value, e := expandString(v); !e {
+      out.K8sKubeconfigPath = value
+    }
+	}
+
+	if v, ok := m["keep_bpf_templates"]; ok {
+		if value, e := expandBool(v); !e {
+      out.KeepBPFTemplates = value
+    }
+	}
+
+	if v, ok := m["keep_config"]; ok {
+		if value, e := expandBool(v); !e {
+      out.KeepConfig = value
+    }
+	}
+
+	if v, ok := m["lb"]; ok {
+		if value, e := expandString(v); !e {
+      out.LB = value
+    }
+	}
+
+	if v, ok := m["label_prefix_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.LabelPrefixFile = value
+    }
+	}
+
+	if v, ok := m["labels"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Labels = value
+    }
+	}
+
+	if v, ok := m["lib_dir"]; ok {
+		if value, e := expandString(v); !e {
+      out.LibDir = value
+    }
+	}
+
+	if v, ok := m["log_driver"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.LogDrivers = value
+    }
+	}
+
+	if v, ok := m["log_opt"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.LogOpt = value
+    }
+	}
+
+	if v, ok := m["logstash"]; ok {
+		if value, e := expandBool(v); !e {
+      out.Logstash = value
+    }
+	}
+
+	if v, ok := m["logstash_agent"]; ok {
+		if value, e := expandString(v); !e {
+      out.LogstashAgent = value
+    }
+	}
+
+	if v, ok := m["logstash_probe_timer"]; ok {
+		if value, e := expandUint32(v); !e {
+      out.LogstashProbeTimer = value
+    }
 	}
 
 	{
-		value := expandBool(d["restart_pods"])
-
-		out.RestartPods = (*value)
+		if value, e := expandString(m["monitor_aggregation"]); !e {
+      out.MonitorAggregation = value
+    }
 	}
 
-	if v, ok := d["restore"]; ok {
-		value := expandBool(v)
-
-		out.Restore = (*value)
-	}
-
-	{
-		out.SidecarIstioProxyImage = expandString(d["sidecar_istio_proxy_image"])
-	}
-
-	if v, ok := d["single_cluster_route"]; ok {
-		value := expandBool(v)
-
-		out.SingleClusterRoute = (*value)
-	}
-
-	if v, ok := d["socket_path"]; ok {
-		out.SocketPath = expandString(v)
-	}
-
-	if v, ok := d["state_dir"]; ok {
-		out.StateDir = expandString(v)
+	if v, ok := m["nat_46range"]; ok {
+		if value, e := expandString(v); !e {
+      out.Nat46Range = value
+    }
 	}
 
 	{
-		value := expandBool(d["to_fqdns_enable_poller"])
-
-		out.ToFqdnsEnablePoller = (*value)
+		if value, e := expandString(m["node_init_bootstrap_file"]); !e {
+      out.NodeInitBootstrapFile = value
+    }
 	}
 
-	if v, ok := d["trace_payloadlen"]; ok {
-		out.TracePayloadLen = expandInt(v)
+	if v, ok := m["pprof"]; ok {
+		if value, e := expandBool(v); !e {
+      out.Pprof = value
+    }
 	}
 
-	if v, ok := d["tunnel"]; ok {
-		out.Tunnel = expandString(v)
+	{
+		if value, e := expandBool(m["preallocate_bpf_maps"]); !e {
+      out.PreallocateBPFMaps = value
+    }
 	}
 
-	if v, ok := d["version"]; ok {
-		out.Version = expandString(v)
+	if v, ok := m["prefilter_device"]; ok {
+		if value, e := expandString(v); !e {
+      out.PrefilterDevice = value
+    }
 	}
 
-	return out
+	if v, ok := m["prometheus_serve_addr"]; ok {
+		if value, e := expandString(v); !e {
+      out.PrometheusServeAddr = value
+    }
+	}
+
+	{
+		if value, e := expandBool(m["reconfigure_kubelet"]); !e {
+      out.ReconfigureKubelet = value
+    }
+	}
+
+	{
+		if value, e := expandBool(m["remove_cbr_bridge"]); !e {
+      out.RemoveCbrBridge = value
+    }
+	}
+
+	{
+		if value, e := expandBool(m["restart_pods"]); !e {
+      out.RestartPods = value
+    }
+	}
+
+	if v, ok := m["restore"]; ok {
+		if value, e := expandBool(v); !e {
+      out.Restore = value
+    }
+	}
+
+	{
+		if value, e := expandString(m["sidecar_istio_proxy_image"]); !e {
+      out.SidecarIstioProxyImage = value
+    }
+	}
+
+	if v, ok := m["single_cluster_route"]; ok {
+		if value, e := expandBool(v); !e {
+      out.SingleClusterRoute = value
+    }
+	}
+
+	if v, ok := m["socket_path"]; ok {
+		if value, e := expandString(v); !e {
+      out.SocketPath = value
+    }
+	}
+
+	if v, ok := m["state_dir"]; ok {
+		if value, e := expandString(v); !e {
+      out.StateDir = value
+    }
+	}
+
+	{
+		if value, e := expandBool(m["to_fqdns_enable_poller"]); !e {
+      out.ToFqdnsEnablePoller = value
+    }
+	}
+
+	if v, ok := m["trace_payloadlen"]; ok {
+		if value, e := expandInt(v); !e {
+      out.TracePayloadLen = value
+    }
+	}
+
+	if v, ok := m["tunnel"]; ok {
+		if value, e := expandString(v); !e {
+      out.Tunnel = value
+    }
+	}
+
+	if v, ok := m["version"]; ok {
+		if value, e := expandString(v); !e {
+      out.Version = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandClassicNetworkingSpec(in interface{}) *kops.ClassicNetworkingSpec {
-	out := in.(*kops.ClassicNetworkingSpec)
+func expandClassicNetworkingSpec(in interface{}) (kops.ClassicNetworkingSpec, bool) {
+	out := kops.ClassicNetworkingSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
 
-	return out
+	return out, false
 }
 
-func expandCloudConfiguration(in interface{}) *kops.CloudConfiguration {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.CloudConfiguration{}
+func expandCloudConfiguration(in interface{}) (kops.CloudConfiguration, bool) {
+	d := in.([]interface{})
+	out := kops.CloudConfiguration{}
 
-	if v, ok := d["disable_security_group_ingress"]; ok {
-		out.DisableSecurityGroupIngress = expandBool(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["elb_security_group"]; ok {
-		value := expandString(v)
+	m := d[0].(map[string]interface{})
 
-		out.ElbSecurityGroup = &value
+	if v, ok := m["disable_security_group_ingress"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DisableSecurityGroupIngress = &value
+    }
 	}
 
-	if v, ok := d["multizone"]; ok {
-		out.Multizone = expandBool(v)
+	if v, ok := m["elb_security_group"]; ok {
+		if value, e := expandString(v); !e {
+      out.ElbSecurityGroup = &value
+    }
 	}
 
-	if v, ok := d["node_instance_prefix"]; ok {
-		value := expandString(v)
-
-		out.NodeInstancePrefix = &value
+	if v, ok := m["multizone"]; ok {
+		if value, e := expandBool(v); !e {
+      out.Multizone = &value
+    }
 	}
 
-	if v, ok := d["node_tags"]; ok {
-		value := expandString(v)
-
-		out.NodeTags = &value
+	if v, ok := m["node_instance_prefix"]; ok {
+		if value, e := expandString(v); !e {
+      out.NodeInstancePrefix = &value
+    }
 	}
 
-	if v, ok := d["openstack"]; ok {
-		out.Openstack = expandOpenstackConfiguration(v)
+	if v, ok := m["node_tags"]; ok {
+		if value, e := expandString(v); !e {
+      out.NodeTags = &value
+    }
 	}
 
-	if v, ok := d["spotinst_orientation"]; ok {
-		value := expandString(v)
-
-		out.SpotinstOrientation = &value
+	if v, ok := m["openstack"]; ok {
+		if value, e := expandOpenstackConfiguration(v); !e {
+      out.Openstack = &value
+    }
 	}
 
-	if v, ok := d["spotinst_product"]; ok {
-		value := expandString(v)
-
-		out.SpotinstProduct = &value
+	if v, ok := m["spotinst_orientation"]; ok {
+		if value, e := expandString(v); !e {
+      out.SpotinstOrientation = &value
+    }
 	}
 
-	if v, ok := d["v_sphere_core_dns_server"]; ok {
-		value := expandString(v)
-
-		out.VSphereCoreDNSServer = &value
+	if v, ok := m["spotinst_product"]; ok {
+		if value, e := expandString(v); !e {
+      out.SpotinstProduct = &value
+    }
 	}
 
-	if v, ok := d["v_sphere_datacenter"]; ok {
-		value := expandString(v)
-
-		out.VSphereDatacenter = &value
+	if v, ok := m["v_sphere_core_dns_server"]; ok {
+		if value, e := expandString(v); !e {
+      out.VSphereCoreDNSServer = &value
+    }
 	}
 
-	if v, ok := d["v_sphere_datastore"]; ok {
-		value := expandString(v)
-
-		out.VSphereDatastore = &value
+	if v, ok := m["v_sphere_datacenter"]; ok {
+		if value, e := expandString(v); !e {
+      out.VSphereDatacenter = &value
+    }
 	}
 
-	if v, ok := d["v_sphere_password"]; ok {
-		value := expandString(v)
-
-		out.VSpherePassword = &value
+	if v, ok := m["v_sphere_datastore"]; ok {
+		if value, e := expandString(v); !e {
+      out.VSphereDatastore = &value
+    }
 	}
 
-	if v, ok := d["v_sphere_resource_pool"]; ok {
-		value := expandString(v)
-
-		out.VSphereResourcePool = &value
+	if v, ok := m["v_sphere_password"]; ok {
+		if value, e := expandString(v); !e {
+      out.VSpherePassword = &value
+    }
 	}
 
-	if v, ok := d["v_sphere_server"]; ok {
-		value := expandString(v)
-
-		out.VSphereServer = &value
+	if v, ok := m["v_sphere_resource_pool"]; ok {
+		if value, e := expandString(v); !e {
+      out.VSphereResourcePool = &value
+    }
 	}
 
-	if v, ok := d["v_sphere_username"]; ok {
-		value := expandString(v)
-
-		out.VSphereUsername = &value
+	if v, ok := m["v_sphere_server"]; ok {
+		if value, e := expandString(v); !e {
+      out.VSphereServer = &value
+    }
 	}
 
-	return out
+	if v, ok := m["v_sphere_username"]; ok {
+		if value, e := expandString(v); !e {
+      out.VSphereUsername = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandCloudControllerManagerConfig(in interface{}) *kops.CloudControllerManagerConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.CloudControllerManagerConfig{}
+func expandCloudControllerManagerConfig(in interface{}) (kops.CloudControllerManagerConfig, bool) {
+	d := in.([]interface{})
+	out := kops.CloudControllerManagerConfig{}
 
-	if v, ok := d["allocate_node_cid_rss"]; ok {
-		out.AllocateNodeCIDRs = expandBool(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["cidr_allocator_type"]; ok {
-		value := expandString(v)
+	m := d[0].(map[string]interface{})
 
-		out.CIDRAllocatorType = &value
+	if v, ok := m["allocate_node_cid_rss"]; ok {
+		if value, e := expandBool(v); !e {
+      out.AllocateNodeCIDRs = &value
+    }
 	}
 
-	if v, ok := d["cloud_provider"]; ok {
-		out.CloudProvider = expandString(v)
+	if v, ok := m["cidr_allocator_type"]; ok {
+		if value, e := expandString(v); !e {
+      out.CIDRAllocatorType = &value
+    }
 	}
 
-	if v, ok := d["cluster_cidr"]; ok {
-		out.ClusterCIDR = expandString(v)
+	if v, ok := m["cloud_provider"]; ok {
+		if value, e := expandString(v); !e {
+      out.CloudProvider = value
+    }
 	}
 
-	if v, ok := d["cluster_name"]; ok {
-		out.ClusterName = expandString(v)
+	if v, ok := m["cluster_cidr"]; ok {
+		if value, e := expandString(v); !e {
+      out.ClusterCIDR = value
+    }
 	}
 
-	if v, ok := d["configure_cloud_routes"]; ok {
-		out.ConfigureCloudRoutes = expandBool(v)
+	if v, ok := m["cluster_name"]; ok {
+		if value, e := expandString(v); !e {
+      out.ClusterName = value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["configure_cloud_routes"]; ok {
+		if value, e := expandBool(v); !e {
+      out.ConfigureCloudRoutes = &value
+    }
 	}
 
-	if v, ok := d["leader_election"]; ok {
-		out.LeaderElection = expandLeaderElectionConfiguration(v)
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["log_level"]; ok {
-		out.LogLevel = expandInt32(v)
+	if v, ok := m["leader_election"]; ok {
+		if value, e := expandLeaderElectionConfiguration(v); !e {
+      out.LeaderElection = &value
+    }
 	}
 
-	if v, ok := d["master"]; ok {
-		out.Master = expandString(v)
+	if v, ok := m["log_level"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.LogLevel = value
+    }
 	}
 
-	if v, ok := d["use_service_account_credentials"]; ok {
-		out.UseServiceAccountCredentials = expandBool(v)
+	if v, ok := m["master"]; ok {
+		if value, e := expandString(v); !e {
+      out.Master = value
+    }
 	}
 
-	return out
+	if v, ok := m["use_service_account_credentials"]; ok {
+		if value, e := expandBool(v); !e {
+      out.UseServiceAccountCredentials = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandClusterSpec(in interface{}) kops.ClusterSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
+func expandClusterSpec(in interface{}) (kops.ClusterSpec, bool) {
+	d := in.([]interface{})
 	out := kops.ClusterSpec{}
 
-	if v, ok := d["api"]; ok {
-		out.API = expandAccessSpec(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["additional_network_cid_rss"]; ok {
-		out.AdditionalNetworkCIDRs = expandStringSlice(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["api"]; ok {
+		if value, e := expandAccessSpec(v); !e {
+      out.API = &value
+    }
 	}
 
-	if v, ok := d["additional_policies"]; ok {
-		value := expandStringMap(v)
-
-		out.AdditionalPolicies = &value
+	if v, ok := m["additional_network_cid_rss"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.AdditionalNetworkCIDRs = value
+    }
 	}
 
-	if v, ok := d["additional_sans"]; ok {
-		out.AdditionalSANs = expandStringSlice(v)
+	if v, ok := m["additional_policies"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.AdditionalPolicies = &value
+    }
 	}
 
-	if v, ok := d["addons"]; ok {
-		out.Addons = expandAddonSpecSlice(v)
+	if v, ok := m["additional_sans"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.AdditionalSANs = value
+    }
 	}
 
-	if v, ok := d["assets"]; ok {
-		out.Assets = expandAssets(v)
+	if v, ok := m["addons"]; ok {
+		if value, e := expandAddonSpecSlice(v); !e {
+      out.Addons = value
+    }
 	}
 
-	if v, ok := d["authentication"]; ok {
-		out.Authentication = expandAuthenticationSpec(v)
+	if v, ok := m["assets"]; ok {
+		if value, e := expandAssets(v); !e {
+      out.Assets = &value
+    }
 	}
 
-	if v, ok := d["authorization"]; ok {
-		out.Authorization = expandAuthorizationSpec(v)
+	if v, ok := m["authentication"]; ok {
+		if value, e := expandAuthenticationSpec(v); !e {
+      out.Authentication = &value
+    }
 	}
 
-	if v, ok := d["channel"]; ok {
-		out.Channel = expandString(v)
+	if v, ok := m["authorization"]; ok {
+		if value, e := expandAuthorizationSpec(v); !e {
+      out.Authorization = &value
+    }
 	}
 
-	if v, ok := d["cloud_config"]; ok {
-		out.CloudConfig = expandCloudConfiguration(v)
+	if v, ok := m["channel"]; ok {
+		if value, e := expandString(v); !e {
+      out.Channel = value
+    }
 	}
 
-	if v, ok := d["cloud_labels"]; ok {
-		out.CloudLabels = expandStringMap(v)
+	if v, ok := m["cloud_config"]; ok {
+		if value, e := expandCloudConfiguration(v); !e {
+      out.CloudConfig = &value
+    }
 	}
 
-	if v, ok := d["cloud_provider"]; ok {
-		out.CloudProvider = expandString(v)
+	if v, ok := m["cloud_labels"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.CloudLabels = value
+    }
 	}
 
-	if v, ok := d["cluster_dns_domain"]; ok {
-		out.ClusterDNSDomain = expandString(v)
+	if v, ok := m["cloud_provider"]; ok {
+		if value, e := expandString(v); !e {
+      out.CloudProvider = value
+    }
 	}
 
-	if v, ok := d["config_base"]; ok {
-		out.ConfigBase = expandString(v)
+	if v, ok := m["cluster_dns_domain"]; ok {
+		if value, e := expandString(v); !e {
+      out.ClusterDNSDomain = value
+    }
 	}
 
-	if v, ok := d["config_store"]; ok {
-		out.ConfigStore = expandString(v)
+	if v, ok := m["config_base"]; ok {
+		if value, e := expandString(v); !e {
+      out.ConfigBase = value
+    }
 	}
 
-	if v, ok := d["dns_zone"]; ok {
-		out.DNSZone = expandString(v)
+	if v, ok := m["config_store"]; ok {
+		if value, e := expandString(v); !e {
+      out.ConfigStore = value
+    }
 	}
 
-	if v, ok := d["disable_subnet_tags"]; ok {
-		value := expandBool(v)
-
-		out.DisableSubnetTags = (*value)
+	if v, ok := m["dns_zone"]; ok {
+		if value, e := expandString(v); !e {
+      out.DNSZone = value
+    }
 	}
 
-	if v, ok := d["docker"]; ok {
-		out.Docker = expandDockerConfig(v)
+	if v, ok := m["disable_subnet_tags"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DisableSubnetTags = value
+    }
 	}
 
-	if v, ok := d["egress_proxy"]; ok {
-		out.EgressProxy = expandEgressProxySpec(v)
+	if v, ok := m["docker"]; ok {
+		if value, e := expandDockerConfig(v); !e {
+      out.Docker = &value
+    }
 	}
 
-	if v, ok := d["encryption_config"]; ok {
-		out.EncryptionConfig = expandBool(v)
+	if v, ok := m["egress_proxy"]; ok {
+		if value, e := expandEgressProxySpec(v); !e {
+      out.EgressProxy = &value
+    }
 	}
 
-	if v, ok := d["etcd_clusters"]; ok {
-		out.EtcdClusters = expandEtcdClusterSpecSlice(v)
+	if v, ok := m["encryption_config"]; ok {
+		if value, e := expandBool(v); !e {
+      out.EncryptionConfig = &value
+    }
 	}
 
-	if v, ok := d["cloud_controller_manager"]; ok {
-		out.ExternalCloudControllerManager = expandCloudControllerManagerConfig(v)
+	if v, ok := m["etcd_clusters"]; ok {
+		if value, e := expandEtcdClusterSpecSlice(v); !e {
+      out.EtcdClusters = value
+    }
 	}
 
-	if v, ok := d["external_dns"]; ok {
-		out.ExternalDNS = expandExternalDNSConfig(v)
+	if v, ok := m["cloud_controller_manager"]; ok {
+		if value, e := expandCloudControllerManagerConfig(v); !e {
+      out.ExternalCloudControllerManager = &value
+    }
 	}
 
-	if v, ok := d["file_assets"]; ok {
-		out.FileAssets = expandFileAssetSpecSlice(v)
+	if v, ok := m["external_dns"]; ok {
+		if value, e := expandExternalDNSConfig(v); !e {
+      out.ExternalDNS = &value
+    }
 	}
 
-	if v, ok := d["hooks"]; ok {
-		out.Hooks = expandHookSpecSlice(v)
+	if v, ok := m["file_assets"]; ok {
+		if value, e := expandFileAssetSpecSlice(v); !e {
+      out.FileAssets = value
+    }
 	}
 
-	if v, ok := d["iam"]; ok {
-		out.IAM = expandIAMSpec(v)
+	if v, ok := m["hooks"]; ok {
+		if value, e := expandHookSpecSlice(v); !e {
+      out.Hooks = value
+    }
 	}
 
-	if v, ok := d["isolate_masters"]; ok {
-		out.IsolateMasters = expandBool(v)
+	if v, ok := m["iam"]; ok {
+		if value, e := expandIAMSpec(v); !e {
+      out.IAM = &value
+    }
 	}
 
-	if v, ok := d["key_store"]; ok {
-		out.KeyStore = expandString(v)
+	if v, ok := m["isolate_masters"]; ok {
+		if value, e := expandBool(v); !e {
+      out.IsolateMasters = &value
+    }
 	}
 
-	if v, ok := d["kube_api_server"]; ok {
-		out.KubeAPIServer = expandKubeAPIServerConfig(v)
+	if v, ok := m["key_store"]; ok {
+		if value, e := expandString(v); !e {
+      out.KeyStore = value
+    }
 	}
 
-	if v, ok := d["kube_controller_manager"]; ok {
-		out.KubeControllerManager = expandKubeControllerManagerConfig(v)
+	if v, ok := m["kube_api_server"]; ok {
+		if value, e := expandKubeAPIServerConfig(v); !e {
+      out.KubeAPIServer = &value
+    }
 	}
 
-	if v, ok := d["kube_dns"]; ok {
-		out.KubeDNS = expandKubeDNSConfig(v)
+	if v, ok := m["kube_controller_manager"]; ok {
+		if value, e := expandKubeControllerManagerConfig(v); !e {
+      out.KubeControllerManager = &value
+    }
 	}
 
-	if v, ok := d["kube_proxy"]; ok {
-		out.KubeProxy = expandKubeProxyConfig(v)
+	if v, ok := m["kube_dns"]; ok {
+		if value, e := expandKubeDNSConfig(v); !e {
+      out.KubeDNS = &value
+    }
 	}
 
-	if v, ok := d["kube_scheduler"]; ok {
-		out.KubeScheduler = expandKubeSchedulerConfig(v)
+	if v, ok := m["kube_proxy"]; ok {
+		if value, e := expandKubeProxyConfig(v); !e {
+      out.KubeProxy = &value
+    }
 	}
 
-	if v, ok := d["kubelet"]; ok {
-		out.Kubelet = expandKubeletConfigSpec(v)
+	if v, ok := m["kube_scheduler"]; ok {
+		if value, e := expandKubeSchedulerConfig(v); !e {
+      out.KubeScheduler = &value
+    }
 	}
 
-	if v, ok := d["kubernetes_api_access"]; ok {
-		out.KubernetesAPIAccess = expandStringSlice(v)
+	if v, ok := m["kubelet"]; ok {
+		if value, e := expandKubeletConfigSpec(v); !e {
+      out.Kubelet = &value
+    }
 	}
 
-	if v, ok := d["kubernetes_version"]; ok {
-		out.KubernetesVersion = expandString(v)
+	if v, ok := m["kubernetes_api_access"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.KubernetesAPIAccess = value
+    }
 	}
 
-	if v, ok := d["master_internal_name"]; ok {
-		out.MasterInternalName = expandString(v)
+	if v, ok := m["kubernetes_version"]; ok {
+		if value, e := expandString(v); !e {
+      out.KubernetesVersion = value
+    }
 	}
 
-	if v, ok := d["master_kubelet"]; ok {
-		out.MasterKubelet = expandKubeletConfigSpec(v)
+	if v, ok := m["master_internal_name"]; ok {
+		if value, e := expandString(v); !e {
+      out.MasterInternalName = value
+    }
 	}
 
-	if v, ok := d["master_public_name"]; ok {
-		out.MasterPublicName = expandString(v)
+	if v, ok := m["master_kubelet"]; ok {
+		if value, e := expandKubeletConfigSpec(v); !e {
+      out.MasterKubelet = &value
+    }
 	}
 
-	if v, ok := d["network_cidr"]; ok {
-		out.NetworkCIDR = expandString(v)
+	if v, ok := m["master_public_name"]; ok {
+		if value, e := expandString(v); !e {
+      out.MasterPublicName = value
+    }
 	}
 
-	if v, ok := d["network_id"]; ok {
-		out.NetworkID = expandString(v)
+	if v, ok := m["network_cidr"]; ok {
+		if value, e := expandString(v); !e {
+      out.NetworkCIDR = value
+    }
 	}
 
-	if v, ok := d["networking"]; ok {
-		out.Networking = expandNetworkingSpec(v)
+	if v, ok := m["network_id"]; ok {
+		if value, e := expandString(v); !e {
+      out.NetworkID = value
+    }
 	}
 
-	if v, ok := d["node_authorization"]; ok {
-		out.NodeAuthorization = expandNodeAuthorizationSpec(v)
+	if v, ok := m["networking"]; ok {
+		if value, e := expandNetworkingSpec(v); !e {
+      out.Networking = &value
+    }
 	}
 
-	if v, ok := d["node_port_access"]; ok {
-		out.NodePortAccess = expandStringSlice(v)
+	if v, ok := m["node_authorization"]; ok {
+		if value, e := expandNodeAuthorizationSpec(v); !e {
+      out.NodeAuthorization = &value
+    }
 	}
 
-	if v, ok := d["non_masquerade_cidr"]; ok {
-		out.NonMasqueradeCIDR = expandString(v)
+	if v, ok := m["node_port_access"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.NodePortAccess = value
+    }
 	}
 
-	if v, ok := d["pod_cidr"]; ok {
-		out.PodCIDR = expandString(v)
+	if v, ok := m["non_masquerade_cidr"]; ok {
+		if value, e := expandString(v); !e {
+      out.NonMasqueradeCIDR = value
+    }
 	}
 
-	if v, ok := d["project"]; ok {
-		out.Project = expandString(v)
+	if v, ok := m["pod_cidr"]; ok {
+		if value, e := expandString(v); !e {
+      out.PodCIDR = value
+    }
 	}
 
-	if v, ok := d["ssh_access"]; ok {
-		out.SSHAccess = expandStringSlice(v)
+	if v, ok := m["project"]; ok {
+		if value, e := expandString(v); !e {
+      out.Project = value
+    }
 	}
 
-	if v, ok := d["ssh_key_name"]; ok {
-		out.SSHKeyName = expandString(v)
+	if v, ok := m["ssh_access"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.SSHAccess = value
+    }
 	}
 
-	if v, ok := d["secret_store"]; ok {
-		out.SecretStore = expandString(v)
+	if v, ok := m["ssh_key_name"]; ok {
+		if value, e := expandString(v); !e {
+      out.SSHKeyName = value
+    }
 	}
 
-	if v, ok := d["service_cluster_ip_range"]; ok {
-		out.ServiceClusterIPRange = expandString(v)
+	if v, ok := m["secret_store"]; ok {
+		if value, e := expandString(v); !e {
+      out.SecretStore = value
+    }
 	}
 
-	if v, ok := d["subnets"]; ok {
-		out.Subnets = expandClusterSubnetSpecSlice(v)
+	if v, ok := m["service_cluster_ip_range"]; ok {
+		if value, e := expandString(v); !e {
+      out.ServiceClusterIPRange = value
+    }
 	}
 
-	if v, ok := d["target"]; ok {
-		out.Target = expandTargetSpec(v)
+	if v, ok := m["subnets"]; ok {
+		if value, e := expandClusterSubnetSpecSlice(v); !e {
+      out.Subnets = value
+    }
 	}
 
-	if v, ok := d["topology"]; ok {
-		out.Topology = expandTopologySpec(v)
+	if v, ok := m["target"]; ok {
+		if value, e := expandTargetSpec(v); !e {
+      out.Target = &value
+    }
 	}
 
-	if v, ok := d["update_policy"]; ok {
-		value := expandString(v)
-
-		out.UpdatePolicy = &value
+	if v, ok := m["topology"]; ok {
+		if value, e := expandTopologySpec(v); !e {
+      out.Topology = &value
+    }
 	}
 
-	return out
+	if v, ok := m["update_policy"]; ok {
+		if value, e := expandString(v); !e {
+      out.UpdatePolicy = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandClusterSubnetSpecSlice(in interface{}) []kops.ClusterSubnetSpec {
+func expandClusterSubnetSpecSlice(in interface{}) ([]kops.ClusterSubnetSpec, bool) {
 	d := in.([]interface{})
 	out := make([]kops.ClusterSubnetSpec , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = kops.ClusterSubnetSpec{}
 
 		if v, ok := d[i].(map[string]interface{})["cidr"]; ok {
-			out[i].CIDR = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].CIDR = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["egress"]; ok {
-			out[i].Egress = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Egress = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["name"]; ok {
-			out[i].Name = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Name = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["id"]; ok {
-			out[i].ProviderID = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].ProviderID = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["public_ip"]; ok {
-			out[i].PublicIP = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].PublicIP = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["region"]; ok {
-			out[i].Region = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Region = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["type"]; ok {
-			out[i].Type = expandSubnetType(v)
+      if value, e := expandSubnetType(v); !e {
+        out[i].Type = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["zone"]; ok {
-			out[i].Zone = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Zone = value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandDNSAccessSpec(in interface{}) *kops.DNSAccessSpec {
-	out := in.(*kops.DNSAccessSpec)
+func expandDNSAccessSpec(in interface{}) (kops.DNSAccessSpec, bool) {
+	out := kops.DNSAccessSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
 
-	return out
+	return out, false
 }
 
-func expandDNSSpec(in interface{}) *kops.DNSSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.DNSSpec{}
+func expandDNSSpec(in interface{}) (kops.DNSSpec, bool) {
+	d := in.([]interface{})
+	out := kops.DNSSpec{}
 
-	if v, ok := d["type"]; ok {
-		out.Type = expandDNSType(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["type"]; ok {
+		if value, e := expandDNSType(v); !e {
+      out.Type = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandDNSType(in interface{}) kops.DNSType {
-	out := in.(kops.DNSType)
+func expandDNSType(in interface{}) (kops.DNSType, bool) {
+	d := in.(string)
+	r := kops.DNSType(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandDockerConfig(in interface{}) *kops.DockerConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.DockerConfig{}
+func expandDockerConfig(in interface{}) (kops.DockerConfig, bool) {
+	d := in.([]interface{})
+	out := kops.DockerConfig{}
 
-	if v, ok := d["authorization_plugins"]; ok {
-		out.AuthorizationPlugins = expandStringSlice(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["bridge"]; ok {
-		value := expandString(v)
+	m := d[0].(map[string]interface{})
 
-		out.Bridge = &value
+	if v, ok := m["authorization_plugins"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.AuthorizationPlugins = value
+    }
 	}
 
-	if v, ok := d["bridge_ip"]; ok {
-		value := expandString(v)
-
-		out.BridgeIP = &value
+	if v, ok := m["bridge"]; ok {
+		if value, e := expandString(v); !e {
+      out.Bridge = &value
+    }
 	}
 
-	if v, ok := d["data_root"]; ok {
-		value := expandString(v)
-
-		out.DataRoot = &value
+	if v, ok := m["bridge_ip"]; ok {
+		if value, e := expandString(v); !e {
+      out.BridgeIP = &value
+    }
 	}
 
-	if v, ok := d["default_ulimit"]; ok {
-		out.DefaultUlimit = expandStringSlice(v)
+	if v, ok := m["data_root"]; ok {
+		if value, e := expandString(v); !e {
+      out.DataRoot = &value
+    }
 	}
 
-	if v, ok := d["exec_opt"]; ok {
-		out.ExecOpt = expandStringSlice(v)
+	if v, ok := m["default_ulimit"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.DefaultUlimit = value
+    }
 	}
 
-	if v, ok := d["exec_root"]; ok {
-		value := expandString(v)
-
-		out.ExecRoot = &value
+	if v, ok := m["exec_opt"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.ExecOpt = value
+    }
 	}
 
-	if v, ok := d["experimental"]; ok {
-		out.Experimental = expandBool(v)
+	if v, ok := m["exec_root"]; ok {
+		if value, e := expandString(v); !e {
+      out.ExecRoot = &value
+    }
 	}
 
-	if v, ok := d["hosts"]; ok {
-		out.Hosts = expandStringSlice(v)
+	if v, ok := m["experimental"]; ok {
+		if value, e := expandBool(v); !e {
+      out.Experimental = &value
+    }
 	}
 
-	if v, ok := d["ip_masq"]; ok {
-		out.IPMasq = expandBool(v)
+	if v, ok := m["hosts"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Hosts = value
+    }
 	}
 
-	if v, ok := d["ip_tables"]; ok {
-		out.IPTables = expandBool(v)
+	if v, ok := m["ip_masq"]; ok {
+		if value, e := expandBool(v); !e {
+      out.IPMasq = &value
+    }
 	}
 
-	if v, ok := d["insecure_registries"]; ok {
-		out.InsecureRegistries = expandStringSlice(v)
+	if v, ok := m["ip_tables"]; ok {
+		if value, e := expandBool(v); !e {
+      out.IPTables = &value
+    }
 	}
 
-	if v, ok := d["insecure_registry"]; ok {
-		value := expandString(v)
-
-		out.InsecureRegistry = &value
+	if v, ok := m["insecure_registries"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.InsecureRegistries = value
+    }
 	}
 
-	if v, ok := d["live_restore"]; ok {
-		out.LiveRestore = expandBool(v)
+	if v, ok := m["insecure_registry"]; ok {
+		if value, e := expandString(v); !e {
+      out.InsecureRegistry = &value
+    }
 	}
 
-	if v, ok := d["log_driver"]; ok {
-		value := expandString(v)
-
-		out.LogDriver = &value
+	if v, ok := m["live_restore"]; ok {
+		if value, e := expandBool(v); !e {
+      out.LiveRestore = &value
+    }
 	}
 
-	if v, ok := d["log_level"]; ok {
-		value := expandString(v)
-
-		out.LogLevel = &value
+	if v, ok := m["log_driver"]; ok {
+		if value, e := expandString(v); !e {
+      out.LogDriver = &value
+    }
 	}
 
-	if v, ok := d["log_opt"]; ok {
-		out.LogOpt = expandStringSlice(v)
+	if v, ok := m["log_level"]; ok {
+		if value, e := expandString(v); !e {
+      out.LogLevel = &value
+    }
 	}
 
-	if v, ok := d["mtu"]; ok {
-		value := expandInt32(v)
-
-		out.MTU = &value
+	if v, ok := m["log_opt"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.LogOpt = value
+    }
 	}
 
-	if v, ok := d["metrics_address"]; ok {
-		value := expandString(v)
-
-		out.MetricsAddress = &value
+	if v, ok := m["mtu"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MTU = &value
+    }
 	}
 
-	if v, ok := d["registry_mirrors"]; ok {
-		out.RegistryMirrors = expandStringSlice(v)
+	if v, ok := m["metrics_address"]; ok {
+		if value, e := expandString(v); !e {
+      out.MetricsAddress = &value
+    }
 	}
 
-	if v, ok := d["skip_install"]; ok {
-		value := expandBool(v)
-
-		out.SkipInstall = (*value)
+	if v, ok := m["registry_mirrors"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.RegistryMirrors = value
+    }
 	}
 
-	if v, ok := d["storage"]; ok {
-		value := expandString(v)
-
-		out.Storage = &value
+	if v, ok := m["skip_install"]; ok {
+		if value, e := expandBool(v); !e {
+      out.SkipInstall = value
+    }
 	}
 
-	if v, ok := d["storage_opts"]; ok {
-		out.StorageOpts = expandStringSlice(v)
+	if v, ok := m["storage"]; ok {
+		if value, e := expandString(v); !e {
+      out.Storage = &value
+    }
 	}
 
-	if v, ok := d["user_namespace_remap"]; ok {
-		out.UserNamespaceRemap = expandString(v)
+	if v, ok := m["storage_opts"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.StorageOpts = value
+    }
 	}
 
-	if v, ok := d["version"]; ok {
-		value := expandString(v)
-
-		out.Version = &value
+	if v, ok := m["user_namespace_remap"]; ok {
+		if value, e := expandString(v); !e {
+      out.UserNamespaceRemap = value
+    }
 	}
 
-	return out
+	if v, ok := m["version"]; ok {
+		if value, e := expandString(v); !e {
+      out.Version = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandEgressProxySpec(in interface{}) *kops.EgressProxySpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.EgressProxySpec{}
+func expandEgressProxySpec(in interface{}) (kops.EgressProxySpec, bool) {
+	d := in.([]interface{})
+	out := kops.EgressProxySpec{}
 
-	if v, ok := d["http_proxy"]; ok {
-		out.HTTPProxy = expandHTTPProxy(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["excludes"]; ok {
-		out.ProxyExcludes = expandString(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["http_proxy"]; ok {
+		if value, e := expandHTTPProxy(v); !e {
+      out.HTTPProxy = value
+    }
 	}
 
-	return out
+	if v, ok := m["excludes"]; ok {
+		if value, e := expandString(v); !e {
+      out.ProxyExcludes = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandEtcdBackupSpec(in interface{}) *kops.EtcdBackupSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.EtcdBackupSpec{}
+func expandEtcdBackupSpec(in interface{}) (kops.EtcdBackupSpec, bool) {
+	d := in.([]interface{})
+	out := kops.EtcdBackupSpec{}
 
-	if v, ok := d["backup_store"]; ok {
-		out.BackupStore = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["backup_store"]; ok {
+		if value, e := expandString(v); !e {
+      out.BackupStore = value
+    }
 	}
 
-	return out
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandEtcdClusterSpecSlice(in interface{}) []*kops.EtcdClusterSpec {
+func expandEtcdClusterSpecSlice(in interface{}) ([]*kops.EtcdClusterSpec, bool) {
 	d := in.([]interface{})
 	out := make([]*kops.EtcdClusterSpec , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = &kops.EtcdClusterSpec{}
 
 		if v, ok := d[i].(map[string]interface{})["backups"]; ok {
-			out[i].Backups = expandEtcdBackupSpec(v)
+      if value, e := expandEtcdBackupSpec(v); !e {
+        out[i].Backups = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["cpu_request"]; ok {
-			out[i].CPURequest = expandQuantity(v)
+      if value, e := expandQuantity(v); !e {
+        out[i].CPURequest = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["enable_etcd_tls"]; ok {
-			value := expandBool(v)
-
-			out[i].EnableEtcdTLS = (*value)
+      if value, e := expandBool(v); !e {
+        out[i].EnableEtcdTLS = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["enable_tls_auth"]; ok {
-			value := expandBool(v)
-
-			out[i].EnableTLSAuth = (*value)
+      if value, e := expandBool(v); !e {
+        out[i].EnableTLSAuth = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["heartbeat_interval"]; ok {
-			out[i].HeartbeatInterval = expandDuration(v)
+      if value, e := expandDuration(v); !e {
+        out[i].HeartbeatInterval = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["image"]; ok {
-			out[i].Image = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Image = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["leader_election_timeout"]; ok {
-			out[i].LeaderElectionTimeout = expandDuration(v)
+      if value, e := expandDuration(v); !e {
+        out[i].LeaderElectionTimeout = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["manager"]; ok {
-			out[i].Manager = expandEtcdManagerSpec(v)
+      if value, e := expandEtcdManagerSpec(v); !e {
+        out[i].Manager = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["etcd_members"]; ok {
-			out[i].Members = expandEtcdMemberSpecSlice(v)
+      if value, e := expandEtcdMemberSpecSlice(v); !e {
+        out[i].Members = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["memory_request"]; ok {
-			out[i].MemoryRequest = expandQuantity(v)
+      if value, e := expandQuantity(v); !e {
+        out[i].MemoryRequest = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["name"]; ok {
-			out[i].Name = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Name = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["provider"]; ok {
-			out[i].Provider = expandEtcdProviderType(v)
+      if value, e := expandEtcdProviderType(v); !e {
+        out[i].Provider = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["version"]; ok {
-			out[i].Version = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Version = value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandEtcdManagerSpec(in interface{}) *kops.EtcdManagerSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.EtcdManagerSpec{}
+func expandEtcdManagerSpec(in interface{}) (kops.EtcdManagerSpec, bool) {
+	d := in.([]interface{})
+	out := kops.EtcdManagerSpec{}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandEtcdMemberSpecSlice(in interface{}) []*kops.EtcdMemberSpec {
+func expandEtcdMemberSpecSlice(in interface{}) ([]*kops.EtcdMemberSpec, bool) {
 	d := in.([]interface{})
 	out := make([]*kops.EtcdMemberSpec , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = &kops.EtcdMemberSpec{}
 
 		if v, ok := d[i].(map[string]interface{})["encrypted_volume"]; ok {
-			out[i].EncryptedVolume = expandBool(v)
+      if value, e := expandBool(v); !e {
+        out[i].EncryptedVolume = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["instance_group"]; ok {
-			value := expandString(v)
-
-			out[i].InstanceGroup = &value
+      if value, e := expandString(v); !e {
+        out[i].InstanceGroup = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["kms_key_id"]; ok {
-			value := expandString(v)
-
-			out[i].KmsKeyId = &value
+      if value, e := expandString(v); !e {
+        out[i].KmsKeyId = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["name"]; ok {
-			out[i].Name = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Name = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["volume_iops"]; ok {
-			value := expandInt32(v)
-
-			out[i].VolumeIops = &value
+      if value, e := expandInt32(v); !e {
+        out[i].VolumeIops = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["volume_size"]; ok {
-			value := expandInt32(v)
-
-			out[i].VolumeSize = &value
+      if value, e := expandInt32(v); !e {
+        out[i].VolumeSize = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["volume_type"]; ok {
-			value := expandString(v)
-
-			out[i].VolumeType = &value
+      if value, e := expandString(v); !e {
+        out[i].VolumeType = &value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandEtcdProviderType(in interface{}) kops.EtcdProviderType {
-	out := in.(kops.EtcdProviderType)
+func expandEtcdProviderType(in interface{}) (kops.EtcdProviderType, bool) {
+	d := in.(string)
+	r := kops.EtcdProviderType(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandExecContainerAction(in interface{}) *kops.ExecContainerAction {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.ExecContainerAction{}
+func expandExecContainerAction(in interface{}) (kops.ExecContainerAction, bool) {
+	d := in.([]interface{})
+	out := kops.ExecContainerAction{}
 
-	if v, ok := d["command"]; ok {
-		out.Command = expandStringSlice(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["environment"]; ok {
-		out.Environment = expandStringMap(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["command"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Command = value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["environment"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.Environment = value
+    }
 	}
 
-	return out
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandExternalDNSConfig(in interface{}) *kops.ExternalDNSConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.ExternalDNSConfig{}
+func expandExternalDNSConfig(in interface{}) (kops.ExternalDNSConfig, bool) {
+	d := in.([]interface{})
+	out := kops.ExternalDNSConfig{}
 
-	if v, ok := d["disable"]; ok {
-		value := expandBool(v)
-
-		out.Disable = (*value)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["watch_ingress"]; ok {
-		out.WatchIngress = expandBool(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["disable"]; ok {
+		if value, e := expandBool(v); !e {
+      out.Disable = value
+    }
 	}
 
-	if v, ok := d["watch_namespace"]; ok {
-		out.WatchNamespace = expandString(v)
+	if v, ok := m["watch_ingress"]; ok {
+		if value, e := expandBool(v); !e {
+      out.WatchIngress = &value
+    }
 	}
 
-	return out
+	if v, ok := m["watch_namespace"]; ok {
+		if value, e := expandString(v); !e {
+      out.WatchNamespace = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandExternalNetworkingSpec(in interface{}) *kops.ExternalNetworkingSpec {
-	out := in.(*kops.ExternalNetworkingSpec)
+func expandExternalNetworkingSpec(in interface{}) (kops.ExternalNetworkingSpec, bool) {
+	out := kops.ExternalNetworkingSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
 
-	return out
+	return out, false
 }
 
-func expandFields(in interface{}) *v1.Fields {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &v1.Fields{}
+func expandFields(in interface{}) (v1.Fields, bool) {
+	d := in.([]interface{})
+	out := v1.Fields{}
+
+	if len(d) < 1 {
+		return out, true
+	}
+
+	m := d[0].(map[string]interface{})
 
 	{
-		out.Map = expandFieldsMap(d)
+		if value, e := expandFieldsMap(m); !e {
+      out.Map = value
+    }
 	}
 
-	return out
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandFieldsMap(in interface{}) map[string]v1.Fields {
-	out := in.(map[string]v1.Fields)
+func expandFieldsMap(in interface{}) (map[string]v1.Fields, bool) {
+	out := make(map[string]v1.Fields)
+  d := in.(map[string]interface{})
+  
+  if len(d) < 1 {
+    return out, true
+  }
 
-	return out
-}
-
-func expandFlannelNetworkingSpec(in interface{}) *kops.FlannelNetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.FlannelNetworkingSpec{}
-
-	if v, ok := d["backend"]; ok {
-		out.Backend = expandString(v)
+	for k, v := range d {
+		out[k] = v.(v1.Fields)
 	}
 
-	if v, ok := d["iptables_resync_seconds"]; ok {
-		value := expandInt32(v)
+	return out, false
+}
 
-		out.IptablesResyncSeconds = &value
+func expandFlannelNetworkingSpec(in interface{}) (kops.FlannelNetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.FlannelNetworkingSpec{}
+
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["backend"]; ok {
+		if value, e := expandString(v); !e {
+      out.Backend = value
+    }
+	}
+
+	if v, ok := m["iptables_resync_seconds"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.IptablesResyncSeconds = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandFloat32(in interface{}) *float32 {
-	out := in.(*float32)
+func expandFloat64(in interface{}) (float64, bool) {
+	d := in.(float64)
+	r := float64(d)
+  out := r
+  
+  if out == 0 {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandFloat64(in interface{}) *float64 {
-	out := in.(*float64)
+func expandFormat(in interface{}) (resource.Format, bool) {
+	d := in.(string)
+	r := resource.Format(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandFormat(in interface{}) resource.Format {
-	out := in.(resource.Format)
+func expandGCENetworkingSpec(in interface{}) (kops.GCENetworkingSpec, bool) {
+	out := kops.GCENetworkingSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
 
-	return out
+	return out, false
 }
 
-func expandGCENetworkingSpec(in interface{}) *kops.GCENetworkingSpec {
-	out := in.(*kops.GCENetworkingSpec)
-
-	return out
-}
-
-func expandHTTPProxy(in interface{}) kops.HTTPProxy {
-	d := in.([]interface{})[0].(map[string]interface{})
+func expandHTTPProxy(in interface{}) (kops.HTTPProxy, bool) {
+	d := in.([]interface{})
 	out := kops.HTTPProxy{}
 
-	if v, ok := d["host"]; ok {
-		out.Host = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["port"]; ok {
-		out.Port = expandInt(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["host"]; ok {
+		if value, e := expandString(v); !e {
+      out.Host = value
+    }
 	}
 
-	return out
+	if v, ok := m["port"]; ok {
+		if value, e := expandInt(v); !e {
+      out.Port = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandIAMSpec(in interface{}) *kops.IAMSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.IAMSpec{}
+func expandIAMSpec(in interface{}) (kops.IAMSpec, bool) {
+	d := in.([]interface{})
+	out := kops.IAMSpec{}
 
-	if v, ok := d["allow_container_registry"]; ok {
-		value := expandBool(v)
+	if len(d) < 1 {
+		return out, true
+	}
 
-		out.AllowContainerRegistry = (*value)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["allow_container_registry"]; ok {
+		if value, e := expandBool(v); !e {
+      out.AllowContainerRegistry = value
+    }
 	}
 
 	{
-		value := expandBool(d["legacy"])
-
-		out.Legacy = (*value)
+		if value, e := expandBool(m["legacy"]); !e {
+      out.Legacy = value
+    }
 	}
 
-	return out
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandInitializerSlice(in interface{}) []v1.Initializer {
+func expandInitializerSlice(in interface{}) ([]v1.Initializer, bool) {
 	d := in.([]interface{})
 	out := make([]v1.Initializer , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = v1.Initializer{}
 
 		if v, ok := d[i].(map[string]interface{})["name"]; ok {
-			out[i].Name = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Name = value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandInstanceGroupRoleSlice(in interface{}) []kops.InstanceGroupRole {
+func expandInstanceGroupRoleSlice(in interface{}) ([]kops.InstanceGroupRole, bool) {
 	d := in.([]interface{})
 	out := make([]kops.InstanceGroupRole , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = d[i].(kops.InstanceGroupRole)
 	}
 
-	return out
+	return out, false
 }
 
-func expandInt(in interface{}) int {
-	out := in.(int)
+func expandInt(in interface{}) (int, bool) {
+	d := in.(int)
+	r := int(d)
+  out := r
+  
+  if out == 0 {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandKopeioAuthenticationSpec(in interface{}) *kops.KopeioAuthenticationSpec {
-	out := in.(*kops.KopeioAuthenticationSpec)
+func expandKopeioAuthenticationSpec(in interface{}) (kops.KopeioAuthenticationSpec, bool) {
+	out := kops.KopeioAuthenticationSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
 
-	return out
+	return out, false
 }
 
-func expandKopeioNetworkingSpec(in interface{}) *kops.KopeioNetworkingSpec {
-	out := in.(*kops.KopeioNetworkingSpec)
+func expandKopeioNetworkingSpec(in interface{}) (kops.KopeioNetworkingSpec, bool) {
+	out := kops.KopeioNetworkingSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
 
-	return out
+	return out, false
 }
 
-func expandKubeAPIServerConfig(in interface{}) *kops.KubeAPIServerConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.KubeAPIServerConfig{}
+func expandKubeAPIServerConfig(in interface{}) (kops.KubeAPIServerConfig, bool) {
+	d := in.([]interface{})
+	out := kops.KubeAPIServerConfig{}
 
-	if v, ok := d["api_audiences"]; ok {
-		out.APIAudiences = expandStringSlice(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["api_server_count"]; ok {
-		value := expandInt32(v)
+	m := d[0].(map[string]interface{})
 
-		out.APIServerCount = &value
+	if v, ok := m["api_audiences"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.APIAudiences = value
+    }
 	}
 
-	if v, ok := d["address"]; ok {
-		out.Address = expandString(v)
+	if v, ok := m["api_server_count"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.APIServerCount = &value
+    }
 	}
 
-	if v, ok := d["admission_control"]; ok {
-		out.AdmissionControl = expandStringSlice(v)
+	if v, ok := m["address"]; ok {
+		if value, e := expandString(v); !e {
+      out.Address = value
+    }
 	}
 
-	if v, ok := d["admission_control_config_file"]; ok {
-		out.AdmissionControlConfigFile = expandString(v)
+	if v, ok := m["admission_control"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.AdmissionControl = value
+    }
 	}
 
-	if v, ok := d["allow_privileged"]; ok {
-		out.AllowPrivileged = expandBool(v)
+	if v, ok := m["admission_control_config_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.AdmissionControlConfigFile = value
+    }
 	}
 
-	if v, ok := d["anonymous_auth"]; ok {
-		out.AnonymousAuth = expandBool(v)
+	if v, ok := m["allow_privileged"]; ok {
+		if value, e := expandBool(v); !e {
+      out.AllowPrivileged = &value
+    }
 	}
 
-	if v, ok := d["append_admission_plugins"]; ok {
-		out.AppendAdmissionPlugins = expandStringSlice(v)
+	if v, ok := m["anonymous_auth"]; ok {
+		if value, e := expandBool(v); !e {
+      out.AnonymousAuth = &value
+    }
 	}
 
-	if v, ok := d["audit_log_format"]; ok {
-		value := expandString(v)
-
-		out.AuditLogFormat = &value
+	if v, ok := m["append_admission_plugins"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.AppendAdmissionPlugins = value
+    }
 	}
 
-	if v, ok := d["audit_log_max_age"]; ok {
-		value := expandInt32(v)
-
-		out.AuditLogMaxAge = &value
+	if v, ok := m["audit_log_format"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuditLogFormat = &value
+    }
 	}
-
-	if v, ok := d["audit_log_max_backups"]; ok {
-		value := expandInt32(v)
 
-		out.AuditLogMaxBackups = &value
+	if v, ok := m["audit_log_max_age"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.AuditLogMaxAge = &value
+    }
 	}
 
-	if v, ok := d["audit_log_max_size"]; ok {
-		value := expandInt32(v)
-
-		out.AuditLogMaxSize = &value
+	if v, ok := m["audit_log_max_backups"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.AuditLogMaxBackups = &value
+    }
 	}
-
-	if v, ok := d["audit_log_path"]; ok {
-		value := expandString(v)
 
-		out.AuditLogPath = &value
+	if v, ok := m["audit_log_max_size"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.AuditLogMaxSize = &value
+    }
 	}
 
-	if v, ok := d["audit_policy_file"]; ok {
-		out.AuditPolicyFile = expandString(v)
+	if v, ok := m["audit_log_path"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuditLogPath = &value
+    }
 	}
 
-	if v, ok := d["audit_webhook_batch_buffer_size"]; ok {
-		value := expandInt32(v)
-
-		out.AuditWebhookBatchBufferSize = &value
+	if v, ok := m["audit_policy_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuditPolicyFile = value
+    }
 	}
-
-	if v, ok := d["audit_webhook_batch_max_size"]; ok {
-		value := expandInt32(v)
 
-		out.AuditWebhookBatchMaxSize = &value
+	if v, ok := m["audit_webhook_batch_buffer_size"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.AuditWebhookBatchBufferSize = &value
+    }
 	}
 
-	if v, ok := d["audit_webhook_batch_max_wait"]; ok {
-		out.AuditWebhookBatchMaxWait = expandDuration(v)
+	if v, ok := m["audit_webhook_batch_max_size"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.AuditWebhookBatchMaxSize = &value
+    }
 	}
 
-	if v, ok := d["audit_webhook_batch_throttle_burst"]; ok {
-		value := expandInt32(v)
-
-		out.AuditWebhookBatchThrottleBurst = &value
+	if v, ok := m["audit_webhook_batch_max_wait"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.AuditWebhookBatchMaxWait = &value
+    }
 	}
 
-	if v, ok := d["audit_webhook_batch_throttle_enable"]; ok {
-		out.AuditWebhookBatchThrottleEnable = expandBool(v)
+	if v, ok := m["audit_webhook_batch_throttle_burst"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.AuditWebhookBatchThrottleBurst = &value
+    }
 	}
 
-	if v, ok := d["audit_webhook_batch_throttle_qps"]; ok {
-		out.AuditWebhookBatchThrottleQps = expandFloat32(v)
+	if v, ok := m["audit_webhook_batch_throttle_enable"]; ok {
+		if value, e := expandBool(v); !e {
+      out.AuditWebhookBatchThrottleEnable = &value
+    }
 	}
 
-	if v, ok := d["audit_webhook_config_file"]; ok {
-		out.AuditWebhookConfigFile = expandString(v)
+	if v, ok := m["audit_webhook_batch_throttle_qps"]; ok {
+		if value, e := expandFloat32(v); !e {
+      out.AuditWebhookBatchThrottleQps = &value
+    }
 	}
 
-	if v, ok := d["audit_webhook_initial_backoff"]; ok {
-		out.AuditWebhookInitialBackoff = expandDuration(v)
+	if v, ok := m["audit_webhook_config_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuditWebhookConfigFile = value
+    }
 	}
 
-	if v, ok := d["audit_webhook_mode"]; ok {
-		out.AuditWebhookMode = expandString(v)
+	if v, ok := m["audit_webhook_initial_backoff"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.AuditWebhookInitialBackoff = &value
+    }
 	}
 
-	if v, ok := d["authentication_token_webhook_cache_ttl"]; ok {
-		out.AuthenticationTokenWebhookCacheTTL = expandDuration(v)
+	if v, ok := m["audit_webhook_mode"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuditWebhookMode = value
+    }
 	}
 
-	if v, ok := d["authentication_token_webhook_config_file"]; ok {
-		value := expandString(v)
-
-		out.AuthenticationTokenWebhookConfigFile = &value
+	if v, ok := m["authentication_token_webhook_cache_ttl"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.AuthenticationTokenWebhookCacheTTL = &value
+    }
 	}
-
-	if v, ok := d["authorization_mode"]; ok {
-		value := expandString(v)
 
-		out.AuthorizationMode = &value
+	if v, ok := m["authentication_token_webhook_config_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuthenticationTokenWebhookConfigFile = &value
+    }
 	}
 
-	if v, ok := d["authorization_rbac_super_user"]; ok {
-		value := expandString(v)
-
-		out.AuthorizationRBACSuperUser = &value
+	if v, ok := m["authorization_mode"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuthorizationMode = &value
+    }
 	}
 
-	if v, ok := d["authorization_webhook_cache_authorized_ttl"]; ok {
-		out.AuthorizationWebhookCacheAuthorizedTTL = expandDuration(v)
+	if v, ok := m["authorization_rbac_super_user"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuthorizationRBACSuperUser = &value
+    }
 	}
 
-	if v, ok := d["authorization_webhook_cache_unauthorized_ttl"]; ok {
-		out.AuthorizationWebhookCacheUnauthorizedTTL = expandDuration(v)
+	if v, ok := m["authorization_webhook_cache_authorized_ttl"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.AuthorizationWebhookCacheAuthorizedTTL = &value
+    }
 	}
-
-	if v, ok := d["authorization_webhook_config_file"]; ok {
-		value := expandString(v)
 
-		out.AuthorizationWebhookConfigFile = &value
+	if v, ok := m["authorization_webhook_cache_unauthorized_ttl"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.AuthorizationWebhookCacheUnauthorizedTTL = &value
+    }
 	}
 
-	if v, ok := d["basic_auth_file"]; ok {
-		out.BasicAuthFile = expandString(v)
+	if v, ok := m["authorization_webhook_config_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.AuthorizationWebhookConfigFile = &value
+    }
 	}
 
-	if v, ok := d["bind_address"]; ok {
-		out.BindAddress = expandString(v)
+	if v, ok := m["basic_auth_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.BasicAuthFile = value
+    }
 	}
 
-	if v, ok := d["cpu_request"]; ok {
-		out.CPURequest = expandString(v)
+	if v, ok := m["bind_address"]; ok {
+		if value, e := expandString(v); !e {
+      out.BindAddress = value
+    }
 	}
 
-	if v, ok := d["client_ca_file"]; ok {
-		out.ClientCAFile = expandString(v)
+	if v, ok := m["cpu_request"]; ok {
+		if value, e := expandString(v); !e {
+      out.CPURequest = value
+    }
 	}
 
-	if v, ok := d["cloud_provider"]; ok {
-		out.CloudProvider = expandString(v)
+	if v, ok := m["client_ca_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.ClientCAFile = value
+    }
 	}
 
-	if v, ok := d["disable_admission_plugins"]; ok {
-		out.DisableAdmissionPlugins = expandStringSlice(v)
+	if v, ok := m["cloud_provider"]; ok {
+		if value, e := expandString(v); !e {
+      out.CloudProvider = value
+    }
 	}
 
-	if v, ok := d["disable_basic_auth"]; ok {
-		value := expandBool(v)
-
-		out.DisableBasicAuth = (*value)
+	if v, ok := m["disable_admission_plugins"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.DisableAdmissionPlugins = value
+    }
 	}
 
-	if v, ok := d["enable_admission_plugins"]; ok {
-		out.EnableAdmissionPlugins = expandStringSlice(v)
+	if v, ok := m["disable_basic_auth"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DisableBasicAuth = value
+    }
 	}
 
-	if v, ok := d["enable_aggregator_routing"]; ok {
-		out.EnableAggregatorRouting = expandBool(v)
+	if v, ok := m["enable_admission_plugins"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.EnableAdmissionPlugins = value
+    }
 	}
 
-	if v, ok := d["enable_bootstrap_token_auth"]; ok {
-		out.EnableBootstrapAuthToken = expandBool(v)
+	if v, ok := m["enable_aggregator_routing"]; ok {
+		if value, e := expandBool(v); !e {
+      out.EnableAggregatorRouting = &value
+    }
 	}
 
-	if v, ok := d["etcd_ca_file"]; ok {
-		out.EtcdCAFile = expandString(v)
+	if v, ok := m["enable_bootstrap_token_auth"]; ok {
+		if value, e := expandBool(v); !e {
+      out.EnableBootstrapAuthToken = &value
+    }
 	}
 
-	if v, ok := d["etcd_cert_file"]; ok {
-		out.EtcdCertFile = expandString(v)
+	if v, ok := m["etcd_ca_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.EtcdCAFile = value
+    }
 	}
 
-	if v, ok := d["etcd_key_file"]; ok {
-		out.EtcdKeyFile = expandString(v)
+	if v, ok := m["etcd_cert_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.EtcdCertFile = value
+    }
 	}
 
-	if v, ok := d["etcd_quorum_read"]; ok {
-		out.EtcdQuorumRead = expandBool(v)
+	if v, ok := m["etcd_key_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.EtcdKeyFile = value
+    }
 	}
 
-	if v, ok := d["etcd_servers"]; ok {
-		out.EtcdServers = expandStringSlice(v)
+	if v, ok := m["etcd_quorum_read"]; ok {
+		if value, e := expandBool(v); !e {
+      out.EtcdQuorumRead = &value
+    }
 	}
 
-	if v, ok := d["etcd_servers_overrides"]; ok {
-		out.EtcdServersOverrides = expandStringSlice(v)
+	if v, ok := m["etcd_servers"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.EtcdServers = value
+    }
 	}
 
-	if v, ok := d["event_ttl"]; ok {
-		out.EventTTL = expandDuration(v)
+	if v, ok := m["etcd_servers_overrides"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.EtcdServersOverrides = value
+    }
 	}
-
-	if v, ok := d["experimental_encryption_provider_config"]; ok {
-		value := expandString(v)
 
-		out.ExperimentalEncryptionProviderConfig = &value
+	if v, ok := m["event_ttl"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.EventTTL = &value
+    }
 	}
 
-	if v, ok := d["feature_gates"]; ok {
-		out.FeatureGates = expandStringMap(v)
+	if v, ok := m["experimental_encryption_provider_config"]; ok {
+		if value, e := expandString(v); !e {
+      out.ExperimentalEncryptionProviderConfig = &value
+    }
 	}
 
-	if v, ok := d["http_2max_streams_per_connection"]; ok {
-		value := expandInt32(v)
-
-		out.HTTP2MaxStreamsPerConnection = &value
+	if v, ok := m["feature_gates"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.FeatureGates = value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["http_2max_streams_per_connection"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.HTTP2MaxStreamsPerConnection = &value
+    }
 	}
 
-	if v, ok := d["insecure_bind_address"]; ok {
-		out.InsecureBindAddress = expandString(v)
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["insecure_port"]; ok {
-		out.InsecurePort = expandInt32(v)
+	if v, ok := m["insecure_bind_address"]; ok {
+		if value, e := expandString(v); !e {
+      out.InsecureBindAddress = value
+    }
 	}
 
-	if v, ok := d["kubelet_client_certificate"]; ok {
-		out.KubeletClientCertificate = expandString(v)
+	if v, ok := m["insecure_port"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.InsecurePort = value
+    }
 	}
 
-	if v, ok := d["kubelet_client_key"]; ok {
-		out.KubeletClientKey = expandString(v)
+	if v, ok := m["kubelet_client_certificate"]; ok {
+		if value, e := expandString(v); !e {
+      out.KubeletClientCertificate = value
+    }
 	}
 
-	if v, ok := d["kubelet_preferred_address_types"]; ok {
-		out.KubeletPreferredAddressTypes = expandStringSlice(v)
+	if v, ok := m["kubelet_client_key"]; ok {
+		if value, e := expandString(v); !e {
+      out.KubeletClientKey = value
+    }
 	}
 
-	if v, ok := d["log_level"]; ok {
-		out.LogLevel = expandInt32(v)
+	if v, ok := m["kubelet_preferred_address_types"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.KubeletPreferredAddressTypes = value
+    }
 	}
 
-	if v, ok := d["max_mutating_requests_inflight"]; ok {
-		out.MaxMutatingRequestsInflight = expandInt32(v)
+	if v, ok := m["log_level"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.LogLevel = value
+    }
 	}
 
-	if v, ok := d["max_requests_inflight"]; ok {
-		out.MaxRequestsInflight = expandInt32(v)
+	if v, ok := m["max_mutating_requests_inflight"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MaxMutatingRequestsInflight = value
+    }
 	}
 
-	if v, ok := d["min_request_timeout"]; ok {
-		value := expandInt32(v)
-
-		out.MinRequestTimeout = &value
+	if v, ok := m["max_requests_inflight"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MaxRequestsInflight = value
+    }
 	}
-
-	if v, ok := d["oidc_ca_file"]; ok {
-		value := expandString(v)
 
-		out.OIDCCAFile = &value
+	if v, ok := m["min_request_timeout"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MinRequestTimeout = &value
+    }
 	}
 
-	if v, ok := d["oidc_client_id"]; ok {
-		value := expandString(v)
-
-		out.OIDCClientID = &value
+	if v, ok := m["oidc_ca_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.OIDCCAFile = &value
+    }
 	}
-
-	if v, ok := d["oidc_groups_claim"]; ok {
-		value := expandString(v)
 
-		out.OIDCGroupsClaim = &value
+	if v, ok := m["oidc_client_id"]; ok {
+		if value, e := expandString(v); !e {
+      out.OIDCClientID = &value
+    }
 	}
 
-	if v, ok := d["oidc_groups_prefix"]; ok {
-		value := expandString(v)
-
-		out.OIDCGroupsPrefix = &value
+	if v, ok := m["oidc_groups_claim"]; ok {
+		if value, e := expandString(v); !e {
+      out.OIDCGroupsClaim = &value
+    }
 	}
-
-	if v, ok := d["oidc_issuer_url"]; ok {
-		value := expandString(v)
 
-		out.OIDCIssuerURL = &value
+	if v, ok := m["oidc_groups_prefix"]; ok {
+		if value, e := expandString(v); !e {
+      out.OIDCGroupsPrefix = &value
+    }
 	}
 
-	if v, ok := d["oidc_required_claim"]; ok {
-		out.OIDCRequiredClaim = expandStringSlice(v)
+	if v, ok := m["oidc_issuer_url"]; ok {
+		if value, e := expandString(v); !e {
+      out.OIDCIssuerURL = &value
+    }
 	}
 
-	if v, ok := d["oidc_username_claim"]; ok {
-		value := expandString(v)
-
-		out.OIDCUsernameClaim = &value
+	if v, ok := m["oidc_required_claim"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.OIDCRequiredClaim = value
+    }
 	}
-
-	if v, ok := d["oidc_username_prefix"]; ok {
-		value := expandString(v)
 
-		out.OIDCUsernamePrefix = &value
+	if v, ok := m["oidc_username_claim"]; ok {
+		if value, e := expandString(v); !e {
+      out.OIDCUsernameClaim = &value
+    }
 	}
 
-	if v, ok := d["proxy_client_cert_file"]; ok {
-		value := expandString(v)
-
-		out.ProxyClientCertFile = &value
+	if v, ok := m["oidc_username_prefix"]; ok {
+		if value, e := expandString(v); !e {
+      out.OIDCUsernamePrefix = &value
+    }
 	}
-
-	if v, ok := d["proxy_client_key_file"]; ok {
-		value := expandString(v)
 
-		out.ProxyClientKeyFile = &value
+	if v, ok := m["proxy_client_cert_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.ProxyClientCertFile = &value
+    }
 	}
 
-	if v, ok := d["requestheader_allowed_names"]; ok {
-		out.RequestheaderAllowedNames = expandStringSlice(v)
+	if v, ok := m["proxy_client_key_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.ProxyClientKeyFile = &value
+    }
 	}
 
-	if v, ok := d["requestheader_client_ca_file"]; ok {
-		out.RequestheaderClientCAFile = expandString(v)
+	if v, ok := m["requestheader_allowed_names"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.RequestheaderAllowedNames = value
+    }
 	}
 
-	if v, ok := d["requestheader_extra_header_prefixes"]; ok {
-		out.RequestheaderExtraHeaderPrefixes = expandStringSlice(v)
+	if v, ok := m["requestheader_client_ca_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.RequestheaderClientCAFile = value
+    }
 	}
 
-	if v, ok := d["requestheader_group_headers"]; ok {
-		out.RequestheaderGroupHeaders = expandStringSlice(v)
+	if v, ok := m["requestheader_extra_header_prefixes"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.RequestheaderExtraHeaderPrefixes = value
+    }
 	}
 
-	if v, ok := d["requestheader_username_headers"]; ok {
-		out.RequestheaderUsernameHeaders = expandStringSlice(v)
+	if v, ok := m["requestheader_group_headers"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.RequestheaderGroupHeaders = value
+    }
 	}
 
-	if v, ok := d["runtime_config"]; ok {
-		out.RuntimeConfig = expandStringMap(v)
+	if v, ok := m["requestheader_username_headers"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.RequestheaderUsernameHeaders = value
+    }
 	}
 
-	if v, ok := d["secure_port"]; ok {
-		out.SecurePort = expandInt32(v)
+	if v, ok := m["runtime_config"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.RuntimeConfig = value
+    }
 	}
 
-	if v, ok := d["service_account_issuer"]; ok {
-		value := expandString(v)
-
-		out.ServiceAccountIssuer = &value
+	if v, ok := m["secure_port"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.SecurePort = value
+    }
 	}
 
-	if v, ok := d["service_account_key_file"]; ok {
-		out.ServiceAccountKeyFile = expandStringSlice(v)
+	if v, ok := m["service_account_issuer"]; ok {
+		if value, e := expandString(v); !e {
+      out.ServiceAccountIssuer = &value
+    }
 	}
-
-	if v, ok := d["service_account_signing_key_file"]; ok {
-		value := expandString(v)
 
-		out.ServiceAccountSigningKeyFile = &value
+	if v, ok := m["service_account_key_file"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.ServiceAccountKeyFile = value
+    }
 	}
 
-	if v, ok := d["service_cluster_ip_range"]; ok {
-		out.ServiceClusterIPRange = expandString(v)
+	if v, ok := m["service_account_signing_key_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.ServiceAccountSigningKeyFile = &value
+    }
 	}
 
-	if v, ok := d["service_node_port_range"]; ok {
-		out.ServiceNodePortRange = expandString(v)
+	if v, ok := m["service_cluster_ip_range"]; ok {
+		if value, e := expandString(v); !e {
+      out.ServiceClusterIPRange = value
+    }
 	}
 
-	if v, ok := d["storage_backend"]; ok {
-		value := expandString(v)
+	if v, ok := m["service_node_port_range"]; ok {
+		if value, e := expandString(v); !e {
+      out.ServiceNodePortRange = value
+    }
+	}
 
-		out.StorageBackend = &value
+	if v, ok := m["storage_backend"]; ok {
+		if value, e := expandString(v); !e {
+      out.StorageBackend = &value
+    }
 	}
 
-	if v, ok := d["tls_cert_file"]; ok {
-		out.TLSCertFile = expandString(v)
+	if v, ok := m["tls_cert_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.TLSCertFile = value
+    }
 	}
 
-	if v, ok := d["tls_cipher_suites"]; ok {
-		out.TLSCipherSuites = expandStringSlice(v)
+	if v, ok := m["tls_cipher_suites"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.TLSCipherSuites = value
+    }
 	}
 
-	if v, ok := d["tls_min_version"]; ok {
-		out.TLSMinVersion = expandString(v)
+	if v, ok := m["tls_min_version"]; ok {
+		if value, e := expandString(v); !e {
+      out.TLSMinVersion = value
+    }
 	}
 
-	if v, ok := d["tls_private_key_file"]; ok {
-		out.TLSPrivateKeyFile = expandString(v)
+	if v, ok := m["tls_private_key_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.TLSPrivateKeyFile = value
+    }
 	}
 
-	if v, ok := d["target_ram_mb"]; ok {
-		out.TargetRamMb = expandInt32(v)
+	if v, ok := m["target_ram_mb"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.TargetRamMb = value
+    }
 	}
 
-	if v, ok := d["token_auth_file"]; ok {
-		out.TokenAuthFile = expandString(v)
+	if v, ok := m["token_auth_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.TokenAuthFile = value
+    }
 	}
+
+  if isEmpty(out) {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandKubeControllerManagerConfig(in interface{}) *kops.KubeControllerManagerConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.KubeControllerManagerConfig{}
+func expandKubeControllerManagerConfig(in interface{}) (kops.KubeControllerManagerConfig, bool) {
+	d := in.([]interface{})
+	out := kops.KubeControllerManagerConfig{}
 
-	if v, ok := d["allocate_node_cid_rss"]; ok {
-		out.AllocateNodeCIDRs = expandBool(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["attach_detach_reconcile_sync_period"]; ok {
-		out.AttachDetachReconcileSyncPeriod = expandDuration(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["allocate_node_cid_rss"]; ok {
+		if value, e := expandBool(v); !e {
+      out.AllocateNodeCIDRs = &value
+    }
 	}
 
-	if v, ok := d["cidr_allocator_type"]; ok {
-		value := expandString(v)
-
-		out.CIDRAllocatorType = &value
+	if v, ok := m["attach_detach_reconcile_sync_period"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.AttachDetachReconcileSyncPeriod = &value
+    }
 	}
 
-	if v, ok := d["cloud_provider"]; ok {
-		out.CloudProvider = expandString(v)
+	if v, ok := m["cidr_allocator_type"]; ok {
+		if value, e := expandString(v); !e {
+      out.CIDRAllocatorType = &value
+    }
 	}
 
-	if v, ok := d["cluster_cidr"]; ok {
-		out.ClusterCIDR = expandString(v)
+	if v, ok := m["cloud_provider"]; ok {
+		if value, e := expandString(v); !e {
+      out.CloudProvider = value
+    }
 	}
 
-	if v, ok := d["cluster_name"]; ok {
-		out.ClusterName = expandString(v)
+	if v, ok := m["cluster_cidr"]; ok {
+		if value, e := expandString(v); !e {
+      out.ClusterCIDR = value
+    }
 	}
 
-	if v, ok := d["configure_cloud_routes"]; ok {
-		out.ConfigureCloudRoutes = expandBool(v)
+	if v, ok := m["cluster_name"]; ok {
+		if value, e := expandString(v); !e {
+      out.ClusterName = value
+    }
 	}
 
-	if v, ok := d["controllers"]; ok {
-		out.Controllers = expandStringSlice(v)
+	if v, ok := m["configure_cloud_routes"]; ok {
+		if value, e := expandBool(v); !e {
+      out.ConfigureCloudRoutes = &value
+    }
 	}
 
-	if v, ok := d["experimental_cluster_signing_duration"]; ok {
-		out.ExperimentalClusterSigningDuration = expandDuration(v)
+	if v, ok := m["controllers"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Controllers = value
+    }
 	}
 
-	if v, ok := d["feature_gates"]; ok {
-		out.FeatureGates = expandStringMap(v)
+	if v, ok := m["experimental_cluster_signing_duration"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.ExperimentalClusterSigningDuration = &value
+    }
 	}
 
-	if v, ok := d["horizontal_pod_autoscaler_downscale_delay"]; ok {
-		out.HorizontalPodAutoscalerDownscaleDelay = expandDuration(v)
+	if v, ok := m["feature_gates"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.FeatureGates = value
+    }
 	}
 
-	if v, ok := d["horizontal_pod_autoscaler_downscale_stabilization"]; ok {
-		out.HorizontalPodAutoscalerDownscaleStabilization = expandDuration(v)
+	if v, ok := m["horizontal_pod_autoscaler_downscale_delay"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.HorizontalPodAutoscalerDownscaleDelay = &value
+    }
 	}
 
-	if v, ok := d["horizontal_pod_autoscaler_sync_period"]; ok {
-		out.HorizontalPodAutoscalerSyncPeriod = expandDuration(v)
+	if v, ok := m["horizontal_pod_autoscaler_downscale_stabilization"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.HorizontalPodAutoscalerDownscaleStabilization = &value
+    }
 	}
 
-	if v, ok := d["horizontal_pod_autoscaler_tolerance"]; ok {
-		out.HorizontalPodAutoscalerTolerance = expandFloat64(v)
+	if v, ok := m["horizontal_pod_autoscaler_sync_period"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.HorizontalPodAutoscalerSyncPeriod = &value
+    }
 	}
 
-	if v, ok := d["horizontal_pod_autoscaler_upscale_delay"]; ok {
-		out.HorizontalPodAutoscalerUpscaleDelay = expandDuration(v)
+	if v, ok := m["horizontal_pod_autoscaler_tolerance"]; ok {
+		if value, e := expandFloat64(v); !e {
+      out.HorizontalPodAutoscalerTolerance = &value
+    }
 	}
 
-	if v, ok := d["horizontal_pod_autoscaler_use_rest_clients"]; ok {
-		out.HorizontalPodAutoscalerUseRestClients = expandBool(v)
+	if v, ok := m["horizontal_pod_autoscaler_upscale_delay"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.HorizontalPodAutoscalerUpscaleDelay = &value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["horizontal_pod_autoscaler_use_rest_clients"]; ok {
+		if value, e := expandBool(v); !e {
+      out.HorizontalPodAutoscalerUseRestClients = &value
+    }
 	}
 
-	if v, ok := d["kube_api_burst"]; ok {
-		value := expandInt32(v)
-
-		out.KubeAPIBurst = &value
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["kube_apiqps"]; ok {
-		out.KubeAPIQPS = expandFloat32(v)
+	if v, ok := m["kube_api_burst"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.KubeAPIBurst = &value
+    }
 	}
 
-	if v, ok := d["leader_election"]; ok {
-		out.LeaderElection = expandLeaderElectionConfiguration(v)
+	if v, ok := m["kube_apiqps"]; ok {
+		if value, e := expandFloat32(v); !e {
+      out.KubeAPIQPS = &value
+    }
 	}
 
-	if v, ok := d["log_level"]; ok {
-		out.LogLevel = expandInt32(v)
+	if v, ok := m["leader_election"]; ok {
+		if value, e := expandLeaderElectionConfiguration(v); !e {
+      out.LeaderElection = &value
+    }
 	}
 
-	if v, ok := d["master"]; ok {
-		out.Master = expandString(v)
+	if v, ok := m["log_level"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.LogLevel = value
+    }
 	}
 
-	if v, ok := d["min_resync_period"]; ok {
-		out.MinResyncPeriod = expandString(v)
+	if v, ok := m["master"]; ok {
+		if value, e := expandString(v); !e {
+      out.Master = value
+    }
 	}
 
-	if v, ok := d["node_cidr_mask_size"]; ok {
-		value := expandInt32(v)
-
-		out.NodeCIDRMaskSize = &value
+	if v, ok := m["min_resync_period"]; ok {
+		if value, e := expandString(v); !e {
+      out.MinResyncPeriod = value
+    }
 	}
 
-	if v, ok := d["node_monitor_grace_period"]; ok {
-		out.NodeMonitorGracePeriod = expandDuration(v)
+	if v, ok := m["node_cidr_mask_size"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.NodeCIDRMaskSize = &value
+    }
 	}
 
-	if v, ok := d["node_monitor_period"]; ok {
-		out.NodeMonitorPeriod = expandDuration(v)
+	if v, ok := m["node_monitor_grace_period"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.NodeMonitorGracePeriod = &value
+    }
 	}
 
-	if v, ok := d["pod_eviction_timeout"]; ok {
-		out.PodEvictionTimeout = expandDuration(v)
+	if v, ok := m["node_monitor_period"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.NodeMonitorPeriod = &value
+    }
 	}
 
-	if v, ok := d["root_ca_file"]; ok {
-		out.RootCAFile = expandString(v)
+	if v, ok := m["pod_eviction_timeout"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.PodEvictionTimeout = &value
+    }
 	}
 
-	if v, ok := d["service_account_private_key_file"]; ok {
-		out.ServiceAccountPrivateKeyFile = expandString(v)
+	if v, ok := m["root_ca_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.RootCAFile = value
+    }
 	}
 
-	if v, ok := d["tls_cipher_suites"]; ok {
-		out.TLSCipherSuites = expandStringSlice(v)
+	if v, ok := m["service_account_private_key_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.ServiceAccountPrivateKeyFile = value
+    }
 	}
 
-	if v, ok := d["tls_min_version"]; ok {
-		out.TLSMinVersion = expandString(v)
+	if v, ok := m["tls_cipher_suites"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.TLSCipherSuites = value
+    }
 	}
 
-	if v, ok := d["terminated_pod_gc_threshold"]; ok {
-		value := expandInt32(v)
-
-		out.TerminatedPodGCThreshold = &value
+	if v, ok := m["tls_min_version"]; ok {
+		if value, e := expandString(v); !e {
+      out.TLSMinVersion = value
+    }
 	}
 
-	if v, ok := d["use_service_account_credentials"]; ok {
-		out.UseServiceAccountCredentials = expandBool(v)
+	if v, ok := m["terminated_pod_gc_threshold"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.TerminatedPodGCThreshold = &value
+    }
 	}
 
-	return out
+	if v, ok := m["use_service_account_credentials"]; ok {
+		if value, e := expandBool(v); !e {
+      out.UseServiceAccountCredentials = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandKubeDNSConfig(in interface{}) *kops.KubeDNSConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.KubeDNSConfig{}
+func expandKubeDNSConfig(in interface{}) (kops.KubeDNSConfig, bool) {
+	d := in.([]interface{})
+	out := kops.KubeDNSConfig{}
 
-	if v, ok := d["cpu_request"]; ok {
-		out.CPURequest = expandQuantity(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["cache_max_concurrent"]; ok {
-		out.CacheMaxConcurrent = expandInt(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["cpu_request"]; ok {
+		if value, e := expandQuantity(v); !e {
+      out.CPURequest = &value
+    }
 	}
 
-	if v, ok := d["cache_max_size"]; ok {
-		out.CacheMaxSize = expandInt(v)
+	if v, ok := m["cache_max_concurrent"]; ok {
+		if value, e := expandInt(v); !e {
+      out.CacheMaxConcurrent = value
+    }
 	}
 
-	if v, ok := d["domain"]; ok {
-		out.Domain = expandString(v)
+	if v, ok := m["cache_max_size"]; ok {
+		if value, e := expandInt(v); !e {
+      out.CacheMaxSize = value
+    }
 	}
 
-	if v, ok := d["external_core_file"]; ok {
-		out.ExternalCoreFile = expandString(v)
+	if v, ok := m["domain"]; ok {
+		if value, e := expandString(v); !e {
+      out.Domain = value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["external_core_file"]; ok {
+		if value, e := expandString(v); !e {
+      out.ExternalCoreFile = value
+    }
 	}
 
-	if v, ok := d["memory_limit"]; ok {
-		out.MemoryLimit = expandQuantity(v)
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["memory_request"]; ok {
-		out.MemoryRequest = expandQuantity(v)
+	if v, ok := m["memory_limit"]; ok {
+		if value, e := expandQuantity(v); !e {
+      out.MemoryLimit = &value
+    }
 	}
 
-	if v, ok := d["provider"]; ok {
-		out.Provider = expandString(v)
+	if v, ok := m["memory_request"]; ok {
+		if value, e := expandQuantity(v); !e {
+      out.MemoryRequest = &value
+    }
 	}
 
-	if v, ok := d["replicas"]; ok {
-		out.Replicas = expandInt(v)
+	if v, ok := m["provider"]; ok {
+		if value, e := expandString(v); !e {
+      out.Provider = value
+    }
 	}
 
-	if v, ok := d["server_ip"]; ok {
-		out.ServerIP = expandString(v)
+	if v, ok := m["replicas"]; ok {
+		if value, e := expandInt(v); !e {
+      out.Replicas = value
+    }
 	}
 
-	if v, ok := d["stub_domains"]; ok {
-		out.StubDomains = expandStringSliceMap(v)
+	if v, ok := m["server_ip"]; ok {
+		if value, e := expandString(v); !e {
+      out.ServerIP = value
+    }
 	}
 
-	if v, ok := d["upstream_nameservers"]; ok {
-		out.UpstreamNameservers = expandStringSlice(v)
+	if v, ok := m["stub_domains"]; ok {
+		if value, e := expandStringSliceMap(v); !e {
+      out.StubDomains = value
+    }
 	}
 
-	return out
+	if v, ok := m["upstream_nameservers"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.UpstreamNameservers = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandKubeProxyConfig(in interface{}) *kops.KubeProxyConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.KubeProxyConfig{}
+func expandKubeProxyConfig(in interface{}) (kops.KubeProxyConfig, bool) {
+	d := in.([]interface{})
+	out := kops.KubeProxyConfig{}
 
-	if v, ok := d["bind_address"]; ok {
-		out.BindAddress = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["cpu_limit"]; ok {
-		out.CPULimit = expandString(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["bind_address"]; ok {
+		if value, e := expandString(v); !e {
+      out.BindAddress = value
+    }
 	}
 
-	if v, ok := d["cpu_request"]; ok {
-		out.CPURequest = expandString(v)
+	if v, ok := m["cpu_limit"]; ok {
+		if value, e := expandString(v); !e {
+      out.CPULimit = value
+    }
 	}
 
-	if v, ok := d["cluster_cidr"]; ok {
-		out.ClusterCIDR = expandString(v)
+	if v, ok := m["cpu_request"]; ok {
+		if value, e := expandString(v); !e {
+      out.CPURequest = value
+    }
 	}
 
-	if v, ok := d["conntrack_max_per_core"]; ok {
-		value := expandInt32(v)
-
-		out.ConntrackMaxPerCore = &value
+	if v, ok := m["cluster_cidr"]; ok {
+		if value, e := expandString(v); !e {
+      out.ClusterCIDR = value
+    }
 	}
 
-	if v, ok := d["conntrack_min"]; ok {
-		value := expandInt32(v)
-
-		out.ConntrackMin = &value
+	if v, ok := m["conntrack_max_per_core"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.ConntrackMaxPerCore = &value
+    }
 	}
 
-	if v, ok := d["enabled"]; ok {
-		out.Enabled = expandBool(v)
+	if v, ok := m["conntrack_min"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.ConntrackMin = &value
+    }
 	}
 
-	if v, ok := d["feature_gates"]; ok {
-		out.FeatureGates = expandStringMap(v)
+	if v, ok := m["enabled"]; ok {
+		if value, e := expandBool(v); !e {
+      out.Enabled = &value
+    }
 	}
 
-	if v, ok := d["hostname_override"]; ok {
-		out.HostnameOverride = expandString(v)
+	if v, ok := m["feature_gates"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.FeatureGates = value
+    }
 	}
 
-	if v, ok := d["ipvs_exclude_cidrs"]; ok {
-		out.IPVSExcludeCIDRS = expandStringSlice(v)
+	if v, ok := m["hostname_override"]; ok {
+		if value, e := expandString(v); !e {
+      out.HostnameOverride = value
+    }
 	}
 
-	if v, ok := d["ipvs_min_sync_period"]; ok {
-		out.IPVSMinSyncPeriod = expandDuration(v)
+	if v, ok := m["ipvs_exclude_cidrs"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.IPVSExcludeCIDRS = value
+    }
 	}
 
-	if v, ok := d["ipvs_scheduler"]; ok {
-		value := expandString(v)
-
-		out.IPVSScheduler = &value
+	if v, ok := m["ipvs_min_sync_period"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.IPVSMinSyncPeriod = &value
+    }
 	}
 
-	if v, ok := d["ipvs_sync_period"]; ok {
-		out.IPVSSyncPeriod = expandDuration(v)
+	if v, ok := m["ipvs_scheduler"]; ok {
+		if value, e := expandString(v); !e {
+      out.IPVSScheduler = &value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["ipvs_sync_period"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.IPVSSyncPeriod = &value
+    }
 	}
 
-	if v, ok := d["log_level"]; ok {
-		out.LogLevel = expandInt32(v)
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["master"]; ok {
-		out.Master = expandString(v)
+	if v, ok := m["log_level"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.LogLevel = value
+    }
 	}
 
-	if v, ok := d["memory_limit"]; ok {
-		out.MemoryLimit = expandString(v)
+	if v, ok := m["master"]; ok {
+		if value, e := expandString(v); !e {
+      out.Master = value
+    }
 	}
 
-	if v, ok := d["memory_request"]; ok {
-		out.MemoryRequest = expandString(v)
+	if v, ok := m["memory_limit"]; ok {
+		if value, e := expandString(v); !e {
+      out.MemoryLimit = value
+    }
 	}
 
-	if v, ok := d["metrics_bind_address"]; ok {
-		value := expandString(v)
-
-		out.MetricsBindAddress = &value
+	if v, ok := m["memory_request"]; ok {
+		if value, e := expandString(v); !e {
+      out.MemoryRequest = value
+    }
 	}
 
-	if v, ok := d["proxy_mode"]; ok {
-		out.ProxyMode = expandString(v)
+	if v, ok := m["metrics_bind_address"]; ok {
+		if value, e := expandString(v); !e {
+      out.MetricsBindAddress = &value
+    }
 	}
 
-	return out
+	if v, ok := m["proxy_mode"]; ok {
+		if value, e := expandString(v); !e {
+      out.ProxyMode = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandKubeSchedulerConfig(in interface{}) *kops.KubeSchedulerConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.KubeSchedulerConfig{}
+func expandKubeSchedulerConfig(in interface{}) (kops.KubeSchedulerConfig, bool) {
+	d := in.([]interface{})
+	out := kops.KubeSchedulerConfig{}
 
-	if v, ok := d["feature_gates"]; ok {
-		out.FeatureGates = expandStringMap(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["feature_gates"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.FeatureGates = value
+    }
 	}
 
-	if v, ok := d["leader_election"]; ok {
-		out.LeaderElection = expandLeaderElectionConfiguration(v)
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["log_level"]; ok {
-		out.LogLevel = expandInt32(v)
+	if v, ok := m["leader_election"]; ok {
+		if value, e := expandLeaderElectionConfiguration(v); !e {
+      out.LeaderElection = &value
+    }
 	}
 
-	if v, ok := d["master"]; ok {
-		out.Master = expandString(v)
+	if v, ok := m["log_level"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.LogLevel = value
+    }
 	}
 
-	if v, ok := d["max_persistent_volumes"]; ok {
-		value := expandInt32(v)
-
-		out.MaxPersistentVolumes = &value
+	if v, ok := m["master"]; ok {
+		if value, e := expandString(v); !e {
+      out.Master = value
+    }
 	}
 
-	if v, ok := d["use_policy_config_map"]; ok {
-		out.UsePolicyConfigMap = expandBool(v)
+	if v, ok := m["max_persistent_volumes"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MaxPersistentVolumes = &value
+    }
 	}
 
-	return out
+	if v, ok := m["use_policy_config_map"]; ok {
+		if value, e := expandBool(v); !e {
+      out.UsePolicyConfigMap = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandKubenetNetworkingSpec(in interface{}) *kops.KubenetNetworkingSpec {
-	out := in.(*kops.KubenetNetworkingSpec)
-
-	return out
-}
-
-func expandKuberouterNetworkingSpec(in interface{}) *kops.KuberouterNetworkingSpec {
-	out := in.(*kops.KuberouterNetworkingSpec)
-
-	return out
-}
-
-func expandLeaderElectionConfiguration(in interface{}) *kops.LeaderElectionConfiguration {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.LeaderElectionConfiguration{}
-
-	if v, ok := d["leader_elect"]; ok {
-		out.LeaderElect = expandBool(v)
+func expandKubenetNetworkingSpec(in interface{}) (kops.KubenetNetworkingSpec, bool) {
+	out := kops.KubenetNetworkingSpec{}
+	
+	if isEmpty(out) {
+		return out, true
 	}
 
-	return out
+	return out, false
 }
 
-func expandListMeta(in interface{}) v1.ListMeta {
-	d := in.([]interface{})[0].(map[string]interface{})
+func expandKuberouterNetworkingSpec(in interface{}) (kops.KuberouterNetworkingSpec, bool) {
+	out := kops.KuberouterNetworkingSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
+
+	return out, false
+}
+
+func expandLeaderElectionConfiguration(in interface{}) (kops.LeaderElectionConfiguration, bool) {
+	d := in.([]interface{})
+	out := kops.LeaderElectionConfiguration{}
+
+	if len(d) < 1 {
+		return out, true
+	}
+
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["leader_elect"]; ok {
+		if value, e := expandBool(v); !e {
+      out.LeaderElect = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
+}
+
+func expandListMeta(in interface{}) (v1.ListMeta, bool) {
+	d := in.([]interface{})
 	out := v1.ListMeta{}
 
-	if v, ok := d["continue"]; ok {
-		out.Continue = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["remaining_item_count"]; ok {
-		value := expandInt64(v)
+	m := d[0].(map[string]interface{})
 
-		out.RemainingItemCount = &value
+	if v, ok := m["continue"]; ok {
+		if value, e := expandString(v); !e {
+      out.Continue = value
+    }
 	}
 
-	if v, ok := d["resource_version"]; ok {
-		out.ResourceVersion = expandString(v)
+	if v, ok := m["remaining_item_count"]; ok {
+		if value, e := expandInt64(v); !e {
+      out.RemainingItemCount = &value
+    }
 	}
 
-	if v, ok := d["self_link"]; ok {
-		out.SelfLink = expandString(v)
+	if v, ok := m["resource_version"]; ok {
+		if value, e := expandString(v); !e {
+      out.ResourceVersion = value
+    }
 	}
 
-	return out
+	if v, ok := m["self_link"]; ok {
+		if value, e := expandString(v); !e {
+      out.SelfLink = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandLoadBalancerAccessSpec(in interface{}) *kops.LoadBalancerAccessSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.LoadBalancerAccessSpec{}
+func expandLoadBalancerAccessSpec(in interface{}) (kops.LoadBalancerAccessSpec, bool) {
+	d := in.([]interface{})
+	out := kops.LoadBalancerAccessSpec{}
 
-	if v, ok := d["additional_security_groups"]; ok {
-		out.AdditionalSecurityGroups = expandStringSlice(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["cross_zone_load_balancing"]; ok {
-		out.CrossZoneLoadBalancing = expandBool(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["additional_security_groups"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.AdditionalSecurityGroups = value
+    }
 	}
 
-	if v, ok := d["idle_timeout_seconds"]; ok {
-		value := expandInt64(v)
-
-		out.IdleTimeoutSeconds = &value
+	if v, ok := m["cross_zone_load_balancing"]; ok {
+		if value, e := expandBool(v); !e {
+      out.CrossZoneLoadBalancing = &value
+    }
 	}
 
-	if v, ok := d["ssl_certificate"]; ok {
-		out.SSLCertificate = expandString(v)
+	if v, ok := m["idle_timeout_seconds"]; ok {
+		if value, e := expandInt64(v); !e {
+      out.IdleTimeoutSeconds = &value
+    }
 	}
 
-	if v, ok := d["security_group_override"]; ok {
-		value := expandString(v)
-
-		out.SecurityGroupOverride = &value
+	if v, ok := m["ssl_certificate"]; ok {
+		if value, e := expandString(v); !e {
+      out.SSLCertificate = value
+    }
 	}
 
-	if v, ok := d["type"]; ok {
-		out.Type = expandLoadBalancerType(v)
+	if v, ok := m["security_group_override"]; ok {
+		if value, e := expandString(v); !e {
+      out.SecurityGroupOverride = &value
+    }
 	}
 
-	if v, ok := d["use_for_internal_api"]; ok {
-		value := expandBool(v)
-
-		out.UseForInternalApi = (*value)
+	if v, ok := m["type"]; ok {
+		if value, e := expandLoadBalancerType(v); !e {
+      out.Type = value
+    }
 	}
 
-	return out
+	if v, ok := m["use_for_internal_api"]; ok {
+		if value, e := expandBool(v); !e {
+      out.UseForInternalApi = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandLoadBalancerType(in interface{}) kops.LoadBalancerType {
-	out := in.(kops.LoadBalancerType)
+func expandLoadBalancerType(in interface{}) (kops.LoadBalancerType, bool) {
+	d := in.(string)
+	r := kops.LoadBalancerType(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandLyftVPCNetworkingSpec(in interface{}) *kops.LyftVPCNetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.LyftVPCNetworkingSpec{}
+func expandLyftVPCNetworkingSpec(in interface{}) (kops.LyftVPCNetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.LyftVPCNetworkingSpec{}
 
-	if v, ok := d["subnet_tags"]; ok {
-		out.SubnetTags = expandStringMap(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["subnet_tags"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.SubnetTags = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandManagedFieldsOperationType(in interface{}) v1.ManagedFieldsOperationType {
-	out := in.(v1.ManagedFieldsOperationType)
+func expandManagedFieldsOperationType(in interface{}) (v1.ManagedFieldsOperationType, bool) {
+	d := in.(string)
+	r := v1.ManagedFieldsOperationType(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandNetworkingSpec(in interface{}) *kops.NetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.NetworkingSpec{}
+func expandNetworkingSpec(in interface{}) (kops.NetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.NetworkingSpec{}
 
-	if v, ok := d["amazonvpc"]; ok {
-		out.AmazonVPC = expandAmazonVPCNetworkingSpec(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["cni"]; ok {
-		out.CNI = expandCNINetworkingSpec(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["amazonvpc"]; ok {
+		if value, e := expandAmazonVPCNetworkingSpec(v); !e {
+      out.AmazonVPC = &value
+    }
 	}
 
-	if v, ok := d["calico"]; ok {
-		out.Calico = expandCalicoNetworkingSpec(v)
+	if v, ok := m["cni"]; ok {
+		if value, e := expandCNINetworkingSpec(v); !e {
+      out.CNI = &value
+    }
 	}
 
-	if v, ok := d["canal"]; ok {
-		out.Canal = expandCanalNetworkingSpec(v)
+	if v, ok := m["calico"]; ok {
+		if value, e := expandCalicoNetworkingSpec(v); !e {
+      out.Calico = &value
+    }
 	}
 
-	if v, ok := d["cilium"]; ok {
-		out.Cilium = expandCiliumNetworkingSpec(v)
+	if v, ok := m["canal"]; ok {
+		if value, e := expandCanalNetworkingSpec(v); !e {
+      out.Canal = &value
+    }
 	}
 
-	if v, ok := d["classic"]; ok {
-		out.Classic = expandClassicNetworkingSpec(v)
+	if v, ok := m["cilium"]; ok {
+		if value, e := expandCiliumNetworkingSpec(v); !e {
+      out.Cilium = &value
+    }
 	}
 
-	if v, ok := d["external"]; ok {
-		out.External = expandExternalNetworkingSpec(v)
+	if v, ok := m["classic"]; ok {
+		if value, e := expandClassicNetworkingSpec(v); !e {
+      out.Classic = &value
+    }
 	}
 
-	if v, ok := d["flannel"]; ok {
-		out.Flannel = expandFlannelNetworkingSpec(v)
+	if v, ok := m["external"]; ok {
+		if value, e := expandExternalNetworkingSpec(v); !e {
+      out.External = &value
+    }
 	}
 
-	if v, ok := d["gce"]; ok {
-		out.GCE = expandGCENetworkingSpec(v)
+	if v, ok := m["flannel"]; ok {
+		if value, e := expandFlannelNetworkingSpec(v); !e {
+      out.Flannel = &value
+    }
 	}
 
-	if v, ok := d["kopeio"]; ok {
-		out.Kopeio = expandKopeioNetworkingSpec(v)
+	if v, ok := m["gce"]; ok {
+		if value, e := expandGCENetworkingSpec(v); !e {
+      out.GCE = &value
+    }
 	}
 
-	if v, ok := d["kubenet"]; ok {
-		out.Kubenet = expandKubenetNetworkingSpec(v)
+	if v, ok := m["kopeio"]; ok {
+		if value, e := expandKopeioNetworkingSpec(v); !e {
+      out.Kopeio = &value
+    }
 	}
 
-	if v, ok := d["kuberouter"]; ok {
-		out.Kuberouter = expandKuberouterNetworkingSpec(v)
+	if v, ok := m["kubenet"]; ok {
+		if value, e := expandKubenetNetworkingSpec(v); !e {
+      out.Kubenet = &value
+    }
 	}
 
-	if v, ok := d["lyftvpc"]; ok {
-		out.LyftVPC = expandLyftVPCNetworkingSpec(v)
+	if v, ok := m["kuberouter"]; ok {
+		if value, e := expandKuberouterNetworkingSpec(v); !e {
+      out.Kuberouter = &value
+    }
 	}
 
-	if v, ok := d["romana"]; ok {
-		out.Romana = expandRomanaNetworkingSpec(v)
+	if v, ok := m["lyftvpc"]; ok {
+		if value, e := expandLyftVPCNetworkingSpec(v); !e {
+      out.LyftVPC = &value
+    }
 	}
 
-	if v, ok := d["weave"]; ok {
-		out.Weave = expandWeaveNetworkingSpec(v)
+	if v, ok := m["romana"]; ok {
+		if value, e := expandRomanaNetworkingSpec(v); !e {
+      out.Romana = &value
+    }
 	}
 
-	return out
+	if v, ok := m["weave"]; ok {
+		if value, e := expandWeaveNetworkingSpec(v); !e {
+      out.Weave = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandNodeAuthorizationSpec(in interface{}) *kops.NodeAuthorizationSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.NodeAuthorizationSpec{}
+func expandNodeAuthorizationSpec(in interface{}) (kops.NodeAuthorizationSpec, bool) {
+	d := in.([]interface{})
+	out := kops.NodeAuthorizationSpec{}
 
-	if v, ok := d["node_authorizer"]; ok {
-		out.NodeAuthorizer = expandNodeAuthorizerSpec(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["node_authorizer"]; ok {
+		if value, e := expandNodeAuthorizerSpec(v); !e {
+      out.NodeAuthorizer = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandNodeAuthorizerSpec(in interface{}) *kops.NodeAuthorizerSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.NodeAuthorizerSpec{}
+func expandNodeAuthorizerSpec(in interface{}) (kops.NodeAuthorizerSpec, bool) {
+	d := in.([]interface{})
+	out := kops.NodeAuthorizerSpec{}
 
-	if v, ok := d["authorizer"]; ok {
-		out.Authorizer = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["features"]; ok {
-		value := expandStringSlice(v)
+	m := d[0].(map[string]interface{})
 
-		out.Features = &value
+	if v, ok := m["authorizer"]; ok {
+		if value, e := expandString(v); !e {
+      out.Authorizer = value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["features"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Features = &value
+    }
 	}
 
-	if v, ok := d["interval"]; ok {
-		out.Interval = expandDuration(v)
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["node_url"]; ok {
-		out.NodeURL = expandString(v)
+	if v, ok := m["interval"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.Interval = &value
+    }
 	}
 
-	if v, ok := d["port"]; ok {
-		out.Port = expandInt(v)
+	if v, ok := m["node_url"]; ok {
+		if value, e := expandString(v); !e {
+      out.NodeURL = value
+    }
 	}
 
-	if v, ok := d["timeout"]; ok {
-		out.Timeout = expandDuration(v)
+	if v, ok := m["port"]; ok {
+		if value, e := expandInt(v); !e {
+      out.Port = value
+    }
 	}
 
-	if v, ok := d["token_ttl"]; ok {
-		out.TokenTTL = expandDuration(v)
+	if v, ok := m["timeout"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.Timeout = &value
+    }
 	}
 
-	return out
+	if v, ok := m["token_ttl"]; ok {
+		if value, e := expandDuration(v); !e {
+      out.TokenTTL = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandOpenstackBlockStorageConfig(in interface{}) *kops.OpenstackBlockStorageConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.OpenstackBlockStorageConfig{}
+func expandOpenstackBlockStorageConfig(in interface{}) (kops.OpenstackBlockStorageConfig, bool) {
+	d := in.([]interface{})
+	out := kops.OpenstackBlockStorageConfig{}
 
-	if v, ok := d["ignore_volume_az"]; ok {
-		out.IgnoreAZ = expandBool(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["override_volume_az"]; ok {
-		value := expandString(v)
+	m := d[0].(map[string]interface{})
 
-		out.OverrideAZ = &value
+	if v, ok := m["ignore_volume_az"]; ok {
+		if value, e := expandBool(v); !e {
+      out.IgnoreAZ = &value
+    }
 	}
 
-	if v, ok := d["bs_version"]; ok {
-		value := expandString(v)
-
-		out.Version = &value
+	if v, ok := m["override_volume_az"]; ok {
+		if value, e := expandString(v); !e {
+      out.OverrideAZ = &value
+    }
 	}
 
-	return out
+	if v, ok := m["bs_version"]; ok {
+		if value, e := expandString(v); !e {
+      out.Version = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandOpenstackConfiguration(in interface{}) *kops.OpenstackConfiguration {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.OpenstackConfiguration{}
+func expandOpenstackConfiguration(in interface{}) (kops.OpenstackConfiguration, bool) {
+	d := in.([]interface{})
+	out := kops.OpenstackConfiguration{}
 
-	if v, ok := d["block_storage"]; ok {
-		out.BlockStorage = expandOpenstackBlockStorageConfig(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["insecure_skip_verify"]; ok {
-		out.InsecureSkipVerify = expandBool(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["block_storage"]; ok {
+		if value, e := expandOpenstackBlockStorageConfig(v); !e {
+      out.BlockStorage = &value
+    }
 	}
 
-	if v, ok := d["loadbalancer"]; ok {
-		out.Loadbalancer = expandOpenstackLoadbalancerConfig(v)
+	if v, ok := m["insecure_skip_verify"]; ok {
+		if value, e := expandBool(v); !e {
+      out.InsecureSkipVerify = &value
+    }
 	}
 
-	if v, ok := d["monitor"]; ok {
-		out.Monitor = expandOpenstackMonitor(v)
+	if v, ok := m["loadbalancer"]; ok {
+		if value, e := expandOpenstackLoadbalancerConfig(v); !e {
+      out.Loadbalancer = &value
+    }
 	}
 
-	if v, ok := d["router"]; ok {
-		out.Router = expandOpenstackRouter(v)
+	if v, ok := m["monitor"]; ok {
+		if value, e := expandOpenstackMonitor(v); !e {
+      out.Monitor = &value
+    }
 	}
 
-	return out
+	if v, ok := m["router"]; ok {
+		if value, e := expandOpenstackRouter(v); !e {
+      out.Router = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandOpenstackLoadbalancerConfig(in interface{}) *kops.OpenstackLoadbalancerConfig {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.OpenstackLoadbalancerConfig{}
+func expandOpenstackLoadbalancerConfig(in interface{}) (kops.OpenstackLoadbalancerConfig, bool) {
+	d := in.([]interface{})
+	out := kops.OpenstackLoadbalancerConfig{}
 
-	if v, ok := d["floating_network"]; ok {
-		value := expandString(v)
-
-		out.FloatingNetwork = &value
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["floating_network_id"]; ok {
-		value := expandString(v)
+	m := d[0].(map[string]interface{})
 
-		out.FloatingNetworkID = &value
+	if v, ok := m["floating_network"]; ok {
+		if value, e := expandString(v); !e {
+      out.FloatingNetwork = &value
+    }
 	}
 
-	if v, ok := d["floating_subnet"]; ok {
-		value := expandString(v)
-
-		out.FloatingSubnet = &value
+	if v, ok := m["floating_network_id"]; ok {
+		if value, e := expandString(v); !e {
+      out.FloatingNetworkID = &value
+    }
 	}
 
-	if v, ok := d["manage_security_groups"]; ok {
-		out.ManageSecGroups = expandBool(v)
+	if v, ok := m["floating_subnet"]; ok {
+		if value, e := expandString(v); !e {
+      out.FloatingSubnet = &value
+    }
 	}
 
-	if v, ok := d["method"]; ok {
-		value := expandString(v)
-
-		out.Method = &value
+	if v, ok := m["manage_security_groups"]; ok {
+		if value, e := expandBool(v); !e {
+      out.ManageSecGroups = &value
+    }
 	}
 
-	if v, ok := d["provider"]; ok {
-		value := expandString(v)
-
-		out.Provider = &value
+	if v, ok := m["method"]; ok {
+		if value, e := expandString(v); !e {
+      out.Method = &value
+    }
 	}
 
-	if v, ok := d["subnet_id"]; ok {
-		value := expandString(v)
-
-		out.SubnetID = &value
+	if v, ok := m["provider"]; ok {
+		if value, e := expandString(v); !e {
+      out.Provider = &value
+    }
 	}
 
-	if v, ok := d["use_octavia"]; ok {
-		out.UseOctavia = expandBool(v)
+	if v, ok := m["subnet_id"]; ok {
+		if value, e := expandString(v); !e {
+      out.SubnetID = &value
+    }
 	}
 
-	return out
+	if v, ok := m["use_octavia"]; ok {
+		if value, e := expandBool(v); !e {
+      out.UseOctavia = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandOpenstackMonitor(in interface{}) *kops.OpenstackMonitor {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.OpenstackMonitor{}
+func expandOpenstackMonitor(in interface{}) (kops.OpenstackMonitor, bool) {
+	d := in.([]interface{})
+	out := kops.OpenstackMonitor{}
 
-	if v, ok := d["delay"]; ok {
-		value := expandString(v)
-
-		out.Delay = &value
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["max_retries"]; ok {
-		value := expandInt(v)
+	m := d[0].(map[string]interface{})
 
-		out.MaxRetries = &value
+	if v, ok := m["delay"]; ok {
+		if value, e := expandString(v); !e {
+      out.Delay = &value
+    }
 	}
 
-	if v, ok := d["timeout"]; ok {
-		value := expandString(v)
-
-		out.Timeout = &value
+	if v, ok := m["max_retries"]; ok {
+		if value, e := expandInt(v); !e {
+      out.MaxRetries = &value
+    }
 	}
 
-	return out
+	if v, ok := m["timeout"]; ok {
+		if value, e := expandString(v); !e {
+      out.Timeout = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandOpenstackRouter(in interface{}) *kops.OpenstackRouter {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.OpenstackRouter{}
+func expandOpenstackRouter(in interface{}) (kops.OpenstackRouter, bool) {
+	d := in.([]interface{})
+	out := kops.OpenstackRouter{}
 
-	if v, ok := d["dns_servers"]; ok {
-		value := expandString(v)
-
-		out.DNSServers = &value
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["external_network"]; ok {
-		value := expandString(v)
+	m := d[0].(map[string]interface{})
 
-		out.ExternalNetwork = &value
+	if v, ok := m["dns_servers"]; ok {
+		if value, e := expandString(v); !e {
+      out.DNSServers = &value
+    }
 	}
 
-	if v, ok := d["external_subnet"]; ok {
-		value := expandString(v)
-
-		out.ExternalSubnet = &value
+	if v, ok := m["external_network"]; ok {
+		if value, e := expandString(v); !e {
+      out.ExternalNetwork = &value
+    }
 	}
 
-	return out
+	if v, ok := m["external_subnet"]; ok {
+		if value, e := expandString(v); !e {
+      out.ExternalSubnet = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandRBACAuthorizationSpec(in interface{}) *kops.RBACAuthorizationSpec {
-	out := in.(*kops.RBACAuthorizationSpec)
+func expandRBACAuthorizationSpec(in interface{}) (kops.RBACAuthorizationSpec, bool) {
+	out := kops.RBACAuthorizationSpec{}
+	
+	if isEmpty(out) {
+		return out, true
+	}
 
-	return out
+	return out, false
 }
 
-func expandRomanaNetworkingSpec(in interface{}) *kops.RomanaNetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.RomanaNetworkingSpec{}
+func expandRomanaNetworkingSpec(in interface{}) (kops.RomanaNetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.RomanaNetworkingSpec{}
 
-	if v, ok := d["daemon_service_ip"]; ok {
-		out.DaemonServiceIP = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["etcd_service_ip"]; ok {
-		out.EtcdServiceIP = expandString(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["daemon_service_ip"]; ok {
+		if value, e := expandString(v); !e {
+      out.DaemonServiceIP = value
+    }
 	}
 
-	return out
+	if v, ok := m["etcd_service_ip"]; ok {
+		if value, e := expandString(v); !e {
+      out.EtcdServiceIP = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandStatus(in interface{}) *v1.Status {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &v1.Status{}
+func expandStatus(in interface{}) (v1.Status, bool) {
+	d := in.([]interface{})
+	out := v1.Status{}
 
-	if v, ok := d["code"]; ok {
-		out.Code = expandInt32(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["details"]; ok {
-		out.Details = expandStatusDetails(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["code"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.Code = value
+    }
 	}
 
-	if v, ok := d["metadata"]; ok {
-		out.ListMeta = expandListMeta(v)
+	if v, ok := m["details"]; ok {
+		if value, e := expandStatusDetails(v); !e {
+      out.Details = &value
+    }
 	}
 
-	if v, ok := d["message"]; ok {
-		out.Message = expandString(v)
+	if v, ok := m["metadata"]; ok {
+		if value, e := expandListMeta(v); !e {
+      out.ListMeta = value
+    }
 	}
 
-	if v, ok := d["reason"]; ok {
-		out.Reason = expandStatusReason(v)
+	if v, ok := m["message"]; ok {
+		if value, e := expandString(v); !e {
+      out.Message = value
+    }
 	}
 
-	if v, ok := d["status"]; ok {
-		out.Status = expandString(v)
+	if v, ok := m["reason"]; ok {
+		if value, e := expandStatusReason(v); !e {
+      out.Reason = value
+    }
+	}
+
+	if v, ok := m["status"]; ok {
+		if value, e := expandString(v); !e {
+      out.Status = value
+    }
 	}
 
 	{
-		out.TypeMeta = expandTypeMeta(in)
+		if value, e := expandTypeMeta(in); !e {
+      out.TypeMeta = value
+    }
 	}
 
-	return out
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandStatusCauseSlice(in interface{}) []v1.StatusCause {
+func expandStatusCauseSlice(in interface{}) ([]v1.StatusCause, bool) {
 	d := in.([]interface{})
 	out := make([]v1.StatusCause , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = v1.StatusCause{}
 
 		if v, ok := d[i].(map[string]interface{})["field"]; ok {
-			out[i].Field = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Field = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["message"]; ok {
-			out[i].Message = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Message = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["reason"]; ok {
-			out[i].Type = expandCauseType(v)
+      if value, e := expandCauseType(v); !e {
+        out[i].Type = value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandStatusDetails(in interface{}) *v1.StatusDetails {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &v1.StatusDetails{}
+func expandStatusDetails(in interface{}) (v1.StatusDetails, bool) {
+	d := in.([]interface{})
+	out := v1.StatusDetails{}
 
-	if v, ok := d["causes"]; ok {
-		out.Causes = expandStatusCauseSlice(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["group"]; ok {
-		out.Group = expandString(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["causes"]; ok {
+		if value, e := expandStatusCauseSlice(v); !e {
+      out.Causes = value
+    }
 	}
 
-	if v, ok := d["kind"]; ok {
-		out.Kind = expandString(v)
+	if v, ok := m["group"]; ok {
+		if value, e := expandString(v); !e {
+      out.Group = value
+    }
 	}
 
-	if v, ok := d["name"]; ok {
-		out.Name = expandString(v)
+	if v, ok := m["kind"]; ok {
+		if value, e := expandString(v); !e {
+      out.Kind = value
+    }
 	}
 
-	if v, ok := d["retry_after_seconds"]; ok {
-		out.RetryAfterSeconds = expandInt32(v)
+	if v, ok := m["name"]; ok {
+		if value, e := expandString(v); !e {
+      out.Name = value
+    }
 	}
 
-	if v, ok := d["uid"]; ok {
-		out.UID = expandUID(v)
+	if v, ok := m["retry_after_seconds"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.RetryAfterSeconds = value
+    }
 	}
 
-	return out
+	if v, ok := m["uid"]; ok {
+		if value, e := expandUID(v); !e {
+      out.UID = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandStatusReason(in interface{}) v1.StatusReason {
-	out := in.(v1.StatusReason)
+func expandStatusReason(in interface{}) (v1.StatusReason, bool) {
+	d := in.(string)
+	r := v1.StatusReason(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandStringSliceMap(in interface{}) map[string][]string {
-	out := in.(map[string][]string)
+func expandStringSliceMap(in interface{}) (map[string][]string, bool) {
+	out := make(map[string][]string)
+  d := in.(map[string]interface{})
+  
+  if len(d) < 1 {
+    return out, true
+  }
 
-	return out
+	for k, v := range d {
+			l := v.([]interface{})
+			out[k] = make([]string, len(l))
+			for i := range l {
+				 out[k][i] = l[i].(string)
+			}
+	}
+
+	return out, false
 }
 
-func expandSubnetType(in interface{}) kops.SubnetType {
-	out := in.(kops.SubnetType)
+func expandSubnetType(in interface{}) (kops.SubnetType, bool) {
+	d := in.(string)
+	r := kops.SubnetType(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandTargetSpec(in interface{}) *kops.TargetSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.TargetSpec{}
+func expandTargetSpec(in interface{}) (kops.TargetSpec, bool) {
+	d := in.([]interface{})
+	out := kops.TargetSpec{}
 
-	if v, ok := d["terraform"]; ok {
-		out.Terraform = expandTerraformSpec(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["terraform"]; ok {
+		if value, e := expandTerraformSpec(v); !e {
+      out.Terraform = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandTerraformSpec(in interface{}) *kops.TerraformSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.TerraformSpec{}
+func expandTerraformSpec(in interface{}) (kops.TerraformSpec, bool) {
+	d := in.([]interface{})
+	out := kops.TerraformSpec{}
 
-	if v, ok := d["provider_extra_config"]; ok {
-		value := expandStringMap(v)
-
-		out.ProviderExtraConfig = &value
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["provider_extra_config"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.ProviderExtraConfig = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandTopologySpec(in interface{}) *kops.TopologySpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.TopologySpec{}
+func expandTopologySpec(in interface{}) (kops.TopologySpec, bool) {
+	d := in.([]interface{})
+	out := kops.TopologySpec{}
 
-	if v, ok := d["bastion"]; ok {
-		out.Bastion = expandBastionSpec(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["dns"]; ok {
-		out.DNS = expandDNSSpec(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["bastion"]; ok {
+		if value, e := expandBastionSpec(v); !e {
+      out.Bastion = &value
+    }
 	}
 
-	if v, ok := d["masters"]; ok {
-		out.Masters = expandString(v)
+	if v, ok := m["dns"]; ok {
+		if value, e := expandDNSSpec(v); !e {
+      out.DNS = &value
+    }
 	}
 
-	if v, ok := d["nodes"]; ok {
-		out.Nodes = expandString(v)
+	if v, ok := m["masters"]; ok {
+		if value, e := expandString(v); !e {
+      out.Masters = value
+    }
 	}
 
-	return out
+	if v, ok := m["nodes"]; ok {
+		if value, e := expandString(v); !e {
+      out.Nodes = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandUint32(in interface{}) uint32 {
-	out := in.(uint32)
+func expandUint32(in interface{}) (uint32, bool) {
+	d := in.(uint32)
+	r := uint32(d)
+  out := r
+  
+  if out == 0 {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandWeaveNetworkingSpec(in interface{}) *kops.WeaveNetworkingSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.WeaveNetworkingSpec{}
+func expandWeaveNetworkingSpec(in interface{}) (kops.WeaveNetworkingSpec, bool) {
+	d := in.([]interface{})
+	out := kops.WeaveNetworkingSpec{}
 
-	if v, ok := d["conn_limit"]; ok {
-		value := expandInt32(v)
-
-		out.ConnLimit = &value
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["mtu"]; ok {
-		value := expandInt32(v)
+	m := d[0].(map[string]interface{})
 
-		out.MTU = &value
+	if v, ok := m["conn_limit"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.ConnLimit = &value
+    }
 	}
 
-	if v, ok := d["net_extra_args"]; ok {
-		out.NetExtraArgs = expandString(v)
+	if v, ok := m["mtu"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MTU = &value
+    }
 	}
 
-	if v, ok := d["no_masq_local"]; ok {
-		value := expandInt32(v)
-
-		out.NoMasqLocal = &value
+	if v, ok := m["net_extra_args"]; ok {
+		if value, e := expandString(v); !e {
+      out.NetExtraArgs = value
+    }
 	}
 
-	return out
+	if v, ok := m["no_masq_local"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.NoMasqLocal = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }

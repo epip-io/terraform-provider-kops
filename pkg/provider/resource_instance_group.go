@@ -17,10 +17,10 @@ func resourceInstanceGroupCreate(d *schema.ResourceData, m interface{}) error {
 	clientset := m.(*ProviderConfig).clientset
 
 	log.Println("Expanding Metadata")
-	metadata := expandObjectMeta(sectionData(d, "metadata"))
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
 
-	log.Println("Expanding Instance Group Spec")
-	spec := expandInstanceGroupSpec(sectionData(d, "spec"))
+	log.Println("Expanding Cluster Spec")
+	spec, _ := expandInstanceGroupSpec(sectionData(d, "spec"))
 
 	ig := &kops.InstanceGroup{
 		ObjectMeta: metadata,
@@ -76,10 +76,10 @@ func resourceInstanceGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	log.Println("Expanding Metadata")
-	metadata := expandObjectMeta(sectionData(d, "metadata"))
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
 
-	log.Println("Expanding Instance Group Spec")
-	spec := expandInstanceGroupSpec(sectionData(d, "spec"))
+	log.Println("Expanding Cluster Spec")
+	spec, _ := expandInstanceGroupSpec(sectionData(d, "spec"))
 
 	ig := &kops.InstanceGroup{
 		ObjectMeta: metadata,
@@ -106,9 +106,9 @@ func resourceInstanceGroupUpdate(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return fmt.Errorf("instanceGroup: %v does not exist", igName)
-		} else {
-			return fmt.Errorf("unable to check for instanceGroup: %v", err)
 		}
+
+		return fmt.Errorf("unable to check for instanceGroup: %v", err)
 	}
 
 	_, err = clientset.InstanceGroupsFor(cluster).Update(ig)
@@ -121,10 +121,10 @@ func resourceInstanceGroupUpdate(d *schema.ResourceData, m interface{}) error {
 
 func resourceInstanceGroupDelete(d *schema.ResourceData, m interface{}) error {
 	log.Println("Expanding Metadata")
-	metadata := expandObjectMeta(sectionData(d, "metadata"))
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
 
-	log.Println("Expanding Instance Group Spec")
-	spec := expandInstanceGroupSpec(sectionData(d, "spec"))
+	log.Println("Expanding Cluster Spec")
+	spec, _ := expandInstanceGroupSpec(sectionData(d, "spec"))
 
 	ig := &kops.InstanceGroup{
 		ObjectMeta: metadata,
@@ -185,10 +185,10 @@ func getInstanceGroup(d *schema.ResourceData, m interface{}) (*kops.InstanceGrou
 	clientset := m.(*ProviderConfig).clientset
 
 	log.Println("Expanding Metadata")
-	metadata := expandObjectMeta(sectionData(d, "metadata"))
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
 
-	log.Println("Expanding Instance Group Spec")
-	spec := expandInstanceGroupSpec(sectionData(d, "spec"))
+	log.Println("Expanding Cluster Spec")
+	spec, _ := expandInstanceGroupSpec(sectionData(d, "spec"))
 
 	ig := &kops.InstanceGroup{
 		ObjectMeta: metadata,

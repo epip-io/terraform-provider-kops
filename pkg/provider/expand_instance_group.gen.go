@@ -6,317 +6,443 @@ import (
 	"k8s.io/kops/pkg/apis/kops"
 )
 
-func expandIAMProfileSpec(in interface{}) *kops.IAMProfileSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.IAMProfileSpec{}
+func expandIAMProfileSpec(in interface{}) (kops.IAMProfileSpec, bool) {
+	d := in.([]interface{})
+	out := kops.IAMProfileSpec{}
 
-	if v, ok := d["profile"]; ok {
-		value := expandString(v)
-
-		out.Profile = &value
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["profile"]; ok {
+		if value, e := expandString(v); !e {
+      out.Profile = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandInstanceGroupRole(in interface{}) kops.InstanceGroupRole {
-	out := in.(kops.InstanceGroupRole)
+func expandInstanceGroupRole(in interface{}) (kops.InstanceGroupRole, bool) {
+	d := in.(string)
+	r := kops.InstanceGroupRole(d)
+  out := r
+  
+  if out == "" {
+    return out, true
+  }
 
-	return out
+	return out, false
 }
 
-func expandInstanceGroupSpec(in interface{}) kops.InstanceGroupSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
+func expandInstanceGroupSpec(in interface{}) (kops.InstanceGroupSpec, bool) {
+	d := in.([]interface{})
 	out := kops.InstanceGroupSpec{}
 
-	if v, ok := d["additional_security_groups"]; ok {
-		out.AdditionalSecurityGroups = expandStringSlice(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["additional_user_data"]; ok {
-		out.AdditionalUserData = expandUserDataSlice(v)
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["additional_security_groups"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.AdditionalSecurityGroups = value
+    }
 	}
 
-	if v, ok := d["associate_public_ip"]; ok {
-		out.AssociatePublicIP = expandBool(v)
+	if v, ok := m["additional_user_data"]; ok {
+		if value, e := expandUserDataSlice(v); !e {
+      out.AdditionalUserData = value
+    }
 	}
 
-	if v, ok := d["cloud_labels"]; ok {
-		out.CloudLabels = expandStringMap(v)
+	if v, ok := m["associate_public_ip"]; ok {
+		if value, e := expandBool(v); !e {
+      out.AssociatePublicIP = &value
+    }
 	}
 
-	if v, ok := d["detailed_instance_monitoring"]; ok {
-		out.DetailedInstanceMonitoring = expandBool(v)
+	if v, ok := m["cloud_labels"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.CloudLabels = value
+    }
 	}
 
-	if v, ok := d["external_load_balancers"]; ok {
-		out.ExternalLoadBalancers = expandLoadBalancerSlice(v)
+	if v, ok := m["detailed_instance_monitoring"]; ok {
+		if value, e := expandBool(v); !e {
+      out.DetailedInstanceMonitoring = &value
+    }
 	}
 
-	if v, ok := d["file_assets"]; ok {
-		out.FileAssets = expandFileAssetSpecSlice(v)
+	if v, ok := m["external_load_balancers"]; ok {
+		if value, e := expandLoadBalancerSlice(v); !e {
+      out.ExternalLoadBalancers = value
+    }
 	}
 
-	if v, ok := d["hooks"]; ok {
-		out.Hooks = expandHookSpecSlice(v)
+	if v, ok := m["file_assets"]; ok {
+		if value, e := expandFileAssetSpecSlice(v); !e {
+      out.FileAssets = value
+    }
 	}
 
-	if v, ok := d["iam"]; ok {
-		out.IAM = expandIAMProfileSpec(v)
+	if v, ok := m["hooks"]; ok {
+		if value, e := expandHookSpecSlice(v); !e {
+      out.Hooks = value
+    }
 	}
 
-	if v, ok := d["image"]; ok {
-		out.Image = expandString(v)
+	if v, ok := m["iam"]; ok {
+		if value, e := expandIAMProfileSpec(v); !e {
+      out.IAM = &value
+    }
 	}
 
-	if v, ok := d["instance_protection"]; ok {
-		out.InstanceProtection = expandBool(v)
+	if v, ok := m["image"]; ok {
+		if value, e := expandString(v); !e {
+      out.Image = value
+    }
 	}
 
-	if v, ok := d["kubelet"]; ok {
-		out.Kubelet = expandKubeletConfigSpec(v)
+	if v, ok := m["instance_protection"]; ok {
+		if value, e := expandBool(v); !e {
+      out.InstanceProtection = &value
+    }
 	}
 
-	if v, ok := d["machine_type"]; ok {
-		out.MachineType = expandString(v)
+	if v, ok := m["kubelet"]; ok {
+		if value, e := expandKubeletConfigSpec(v); !e {
+      out.Kubelet = &value
+    }
 	}
 
-	if v, ok := d["max_price"]; ok {
-		value := expandString(v)
-
-		out.MaxPrice = &value
+	if v, ok := m["machine_type"]; ok {
+		if value, e := expandString(v); !e {
+      out.MachineType = value
+    }
 	}
 
-	if v, ok := d["max_size"]; ok {
-		value := expandInt32(v)
-
-		out.MaxSize = &value
+	if v, ok := m["max_price"]; ok {
+		if value, e := expandString(v); !e {
+      out.MaxPrice = &value
+    }
 	}
 
-	if v, ok := d["min_size"]; ok {
-		value := expandInt32(v)
-
-		out.MinSize = &value
+	if v, ok := m["max_size"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MaxSize = &value
+    }
 	}
 
-	if v, ok := d["mixed_instances_policy"]; ok {
-		out.MixedInstancesPolicy = expandMixedInstancesPolicySpec(v)
+	if v, ok := m["min_size"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.MinSize = &value
+    }
 	}
 
-	if v, ok := d["node_labels"]; ok {
-		out.NodeLabels = expandStringMap(v)
+	if v, ok := m["mixed_instances_policy"]; ok {
+		if value, e := expandMixedInstancesPolicySpec(v); !e {
+      out.MixedInstancesPolicy = &value
+    }
 	}
 
-	if v, ok := d["role"]; ok {
-		out.Role = expandInstanceGroupRole(v)
+	if v, ok := m["node_labels"]; ok {
+		if value, e := expandStringMap(v); !e {
+      out.NodeLabels = value
+    }
 	}
 
-	if v, ok := d["root_volume_iops"]; ok {
-		value := expandInt32(v)
-
-		out.RootVolumeIops = &value
+	if v, ok := m["role"]; ok {
+		if value, e := expandInstanceGroupRole(v); !e {
+      out.Role = value
+    }
 	}
 
-	if v, ok := d["root_volume_optimization"]; ok {
-		out.RootVolumeOptimization = expandBool(v)
+	if v, ok := m["root_volume_iops"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.RootVolumeIops = &value
+    }
 	}
 
-	if v, ok := d["root_volume_size"]; ok {
-		value := expandInt32(v)
-
-		out.RootVolumeSize = &value
+	if v, ok := m["root_volume_optimization"]; ok {
+		if value, e := expandBool(v); !e {
+      out.RootVolumeOptimization = &value
+    }
 	}
 
-	if v, ok := d["root_volume_type"]; ok {
-		value := expandString(v)
-
-		out.RootVolumeType = &value
+	if v, ok := m["root_volume_size"]; ok {
+		if value, e := expandInt32(v); !e {
+      out.RootVolumeSize = &value
+    }
 	}
 
-	if v, ok := d["security_group_override"]; ok {
-		value := expandString(v)
-
-		out.SecurityGroupOverride = &value
+	if v, ok := m["root_volume_type"]; ok {
+		if value, e := expandString(v); !e {
+      out.RootVolumeType = &value
+    }
 	}
 
-	if v, ok := d["subnets"]; ok {
-		out.Subnets = expandStringSlice(v)
+	if v, ok := m["security_group_override"]; ok {
+		if value, e := expandString(v); !e {
+      out.SecurityGroupOverride = &value
+    }
 	}
 
-	if v, ok := d["suspend_processes"]; ok {
-		out.SuspendProcesses = expandStringSlice(v)
+	if v, ok := m["subnets"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Subnets = value
+    }
 	}
 
-	if v, ok := d["taints"]; ok {
-		out.Taints = expandStringSlice(v)
+	if v, ok := m["suspend_processes"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.SuspendProcesses = value
+    }
 	}
 
-	if v, ok := d["tenancy"]; ok {
-		out.Tenancy = expandString(v)
+	if v, ok := m["taints"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Taints = value
+    }
 	}
 
-	if v, ok := d["volume_mounts"]; ok {
-		out.VolumeMounts = expandVolumeMountSpecSlice(v)
+	if v, ok := m["tenancy"]; ok {
+		if value, e := expandString(v); !e {
+      out.Tenancy = value
+    }
 	}
 
-	if v, ok := d["volumes"]; ok {
-		out.Volumes = expandVolumeSpecSlice(v)
+	if v, ok := m["volume_mounts"]; ok {
+		if value, e := expandVolumeMountSpecSlice(v); !e {
+      out.VolumeMounts = value
+    }
 	}
 
-	if v, ok := d["zones"]; ok {
-		out.Zones = expandStringSlice(v)
+	if v, ok := m["volumes"]; ok {
+		if value, e := expandVolumeSpecSlice(v); !e {
+      out.Volumes = value
+    }
 	}
 
-	return out
+	if v, ok := m["zones"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Zones = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandLoadBalancerSlice(in interface{}) []kops.LoadBalancer {
+func expandLoadBalancerSlice(in interface{}) ([]kops.LoadBalancer, bool) {
 	d := in.([]interface{})
 	out := make([]kops.LoadBalancer , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = kops.LoadBalancer{}
 
 		if v, ok := d[i].(map[string]interface{})["load_balancer_name"]; ok {
-			value := expandString(v)
-
-			out[i].LoadBalancerName = &value
+      if value, e := expandString(v); !e {
+        out[i].LoadBalancerName = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["target_group_arn"]; ok {
-			value := expandString(v)
-
-			out[i].TargetGroupARN = &value
+      if value, e := expandString(v); !e {
+        out[i].TargetGroupARN = &value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandMixedInstancesPolicySpec(in interface{}) *kops.MixedInstancesPolicySpec {
-	d := in.([]interface{})[0].(map[string]interface{})
-	out := &kops.MixedInstancesPolicySpec{}
+func expandMixedInstancesPolicySpec(in interface{}) (kops.MixedInstancesPolicySpec, bool) {
+	d := in.([]interface{})
+	out := kops.MixedInstancesPolicySpec{}
 
-	if v, ok := d["instances"]; ok {
-		out.Instances = expandStringSlice(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	if v, ok := d["on_demand_above_base"]; ok {
-		value := expandInt64(v)
+	m := d[0].(map[string]interface{})
 
-		out.OnDemandAboveBase = &value
+	if v, ok := m["instances"]; ok {
+		if value, e := expandStringSlice(v); !e {
+      out.Instances = value
+    }
 	}
 
-	if v, ok := d["on_demand_allocation_strategy"]; ok {
-		value := expandString(v)
-
-		out.OnDemandAllocationStrategy = &value
+	if v, ok := m["on_demand_above_base"]; ok {
+		if value, e := expandInt64(v); !e {
+      out.OnDemandAboveBase = &value
+    }
 	}
 
-	if v, ok := d["on_demand_base"]; ok {
-		value := expandInt64(v)
-
-		out.OnDemandBase = &value
+	if v, ok := m["on_demand_allocation_strategy"]; ok {
+		if value, e := expandString(v); !e {
+      out.OnDemandAllocationStrategy = &value
+    }
 	}
 
-	if v, ok := d["spot_allocation_strategy"]; ok {
-		value := expandString(v)
-
-		out.SpotAllocationStrategy = &value
+	if v, ok := m["on_demand_base"]; ok {
+		if value, e := expandInt64(v); !e {
+      out.OnDemandBase = &value
+    }
 	}
 
-	if v, ok := d["spot_instance_pools"]; ok {
-		value := expandInt64(v)
-
-		out.SpotInstancePools = &value
+	if v, ok := m["spot_allocation_strategy"]; ok {
+		if value, e := expandString(v); !e {
+      out.SpotAllocationStrategy = &value
+    }
 	}
 
-	return out
+	if v, ok := m["spot_instance_pools"]; ok {
+		if value, e := expandInt64(v); !e {
+      out.SpotInstancePools = &value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }
 
-func expandUserDataSlice(in interface{}) []kops.UserData {
+func expandUserDataSlice(in interface{}) ([]kops.UserData, bool) {
 	d := in.([]interface{})
 	out := make([]kops.UserData , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = kops.UserData{}
 
 		if v, ok := d[i].(map[string]interface{})["content"]; ok {
-			out[i].Content = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Content = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["name"]; ok {
-			out[i].Name = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Name = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["type"]; ok {
-			out[i].Type = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Type = value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandVolumeMountSpecSlice(in interface{}) []*kops.VolumeMountSpec {
+func expandVolumeMountSpecSlice(in interface{}) ([]*kops.VolumeMountSpec, bool) {
 	d := in.([]interface{})
 	out := make([]*kops.VolumeMountSpec , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = &kops.VolumeMountSpec{}
 
 		if v, ok := d[i].(map[string]interface{})["device"]; ok {
-			out[i].Device = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Device = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["filesystem"]; ok {
-			out[i].Filesystem = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Filesystem = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["format_options"]; ok {
-			out[i].FormatOptions = expandStringSlice(v)
+      if value, e := expandStringSlice(v); !e {
+        out[i].FormatOptions = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["mount_options"]; ok {
-			out[i].MountOptions = expandStringSlice(v)
+      if value, e := expandStringSlice(v); !e {
+        out[i].MountOptions = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["path"]; ok {
-			out[i].Path = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Path = value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }
 
-func expandVolumeSpecSlice(in interface{}) []*kops.VolumeSpec {
+func expandVolumeSpecSlice(in interface{}) ([]*kops.VolumeSpec, bool) {
 	d := in.([]interface{})
 	out := make([]*kops.VolumeSpec , len(d))
+
+  if len(d) < 1 {
+    return out, true
+  }
 
 	for i := 0; i < len(d); i++ {
 		out[i] = &kops.VolumeSpec{}
 
 		if v, ok := d[i].(map[string]interface{})["device"]; ok {
-			out[i].Device = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Device = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["encrypted"]; ok {
-			out[i].Encrypted = expandBool(v)
+      if value, e := expandBool(v); !e {
+        out[i].Encrypted = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["iops"]; ok {
-			value := expandInt64(v)
-
-			out[i].Iops = &value
+      if value, e := expandInt64(v); !e {
+        out[i].Iops = &value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["size"]; ok {
-			out[i].Size = expandInt64(v)
+      if value, e := expandInt64(v); !e {
+        out[i].Size = value
+      }
 		}
 
 		if v, ok := d[i].(map[string]interface{})["type"]; ok {
-			out[i].Type = expandString(v)
+      if value, e := expandString(v); !e {
+        out[i].Type = value
+      }
 		}
 	}
 
-	return out
+	return out, false
 }

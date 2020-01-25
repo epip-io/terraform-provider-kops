@@ -12,14 +12,15 @@ import (
 	"k8s.io/kops/upup/pkg/fi"
 )
 
+// SecretTypeSSHPublicKey ...
 const SecretTypeSSHPublicKey = kops.KeysetType("SSHPublicKey")
 
 func resourceSSHCredentialCreate(d *schema.ResourceData, m interface{}) error {
 	log.Println("Expanding Metadata")
-	metadata := expandObjectMeta(sectionData(d, "metadata"))
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
 
-	log.Println("Expanding SSH Credential Spec")
-	spec := expandSSHCredentialSpec(sectionData(d, "spec"))
+	log.Println("Expanding Cluster Spec")
+	spec, _ := expandSSHCredentialSpec(sectionData(d, "spec"))
 
 	sshc := &kops.SSHCredential{
 		ObjectMeta: metadata,
@@ -82,10 +83,10 @@ func resourceSSHCredentialUpdate(d *schema.ResourceData, m interface{}) error {
 
 func resourceSSHCredentialDelete(d *schema.ResourceData, m interface{}) error {
 	log.Println("Expanding Metadata")
-	metadata := expandObjectMeta(sectionData(d, "metadata"))
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
 
-	log.Println("Expanding SSH Credential Spec")
-	spec := expandSSHCredentialSpec(sectionData(d, "spec"))
+	log.Println("Expanding Cluster Spec")
+	spec, _ := expandSSHCredentialSpec(sectionData(d, "spec"))
 
 	sshc := &kops.SSHCredential{
 		ObjectMeta: metadata,
@@ -134,10 +135,10 @@ func resourceSSHCredentialExists(d *schema.ResourceData, m interface{}) (bool, e
 
 func getSSHCredential(d *schema.ResourceData, m interface{}) (*kops.SSHCredential, error) {
 	log.Println("Expanding Metadata")
-	metadata := expandObjectMeta(sectionData(d, "metadata"))
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
 
-	log.Println("Expanding SSH Credential Spec")
-	spec := expandSSHCredentialSpec(sectionData(d, "spec"))
+	log.Println("Expanding Cluster Spec")
+	spec, _ := expandSSHCredentialSpec(sectionData(d, "spec"))
 
 	sshc := &kops.SSHCredential{
 		ObjectMeta: metadata,

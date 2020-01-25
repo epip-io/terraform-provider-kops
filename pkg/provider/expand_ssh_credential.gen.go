@@ -6,13 +6,25 @@ import (
 	"k8s.io/kops/pkg/apis/kops"
 )
 
-func expandSSHCredentialSpec(in interface{}) kops.SSHCredentialSpec {
-	d := in.([]interface{})[0].(map[string]interface{})
+func expandSSHCredentialSpec(in interface{}) (kops.SSHCredentialSpec, bool) {
+	d := in.([]interface{})
 	out := kops.SSHCredentialSpec{}
 
-	if v, ok := d["public_key"]; ok {
-		out.PublicKey = expandString(v)
+	if len(d) < 1 {
+		return out, true
 	}
 
-	return out
+	m := d[0].(map[string]interface{})
+
+	if v, ok := m["public_key"]; ok {
+		if value, e := expandString(v); !e {
+      out.PublicKey = value
+    }
+	}
+
+  if isEmpty(out) {
+    return out, true
+  }
+
+	return out, false
 }

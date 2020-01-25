@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -16,10 +17,15 @@ func resourceClusterCreate(d *schema.ResourceData, m interface{}) error {
 	clientset := m.(*ProviderConfig).clientset
 
 	log.Println("Expanding Metadata")
-	metadata := expandObjectMeta(sectionData(d, "metadata"))
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
 
 	log.Println("Expanding Cluster Spec")
-	spec := expandClusterSpec(sectionData(d, "spec"))
+	spec, _ := expandClusterSpec(sectionData(d, "spec"))
+
+	md, _ := json.MarshalIndent(metadata, "", "  ")
+	log.Printf("%v\n", string(md))
+	md, _ = json.MarshalIndent(spec, "", "  ")
+	log.Printf("%v\n", string(md))
 
 	log.Println("Creating Cluster")
 	cluster, err := clientset.CreateCluster(&kops.Cluster{
@@ -74,9 +80,15 @@ func resourceClusterUpdate(d *schema.ResourceData, m interface{}) error {
 
 	clientset := m.(*ProviderConfig).clientset
 
+	log.Println("Expanding Metadata")
+	metadata, _ := expandObjectMeta(sectionData(d, "metadata"))
+
+	log.Println("Expanding Cluster Spec")
+	spec, _ := expandClusterSpec(sectionData(d, "spec"))
+
 	_, err := clientset.UpdateCluster(&kops.Cluster{
-		ObjectMeta: expandObjectMeta(sectionData(d, "metadata")),
-		Spec:       expandClusterSpec(sectionData(d, "spec")),
+		ObjectMeta: metadata,
+		Spec:       spec,
 	}, nil)
 
 	if err != nil {
